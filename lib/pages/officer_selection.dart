@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pollutant_inspection/pages/landing_page.dart';
 import 'package:pollutant_inspection/pages/pollutant_register.dart';
 
 import 'package:pollutant_inspection/widgets/dropdown_3.dart';
@@ -36,24 +37,26 @@ class OfficerSelection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          DropdownList(key:GlobalKey(),
-            title: "افسر شیفت",
-            items: MapConvertor.MapToList(relationWithOwnerItems), //  MapToList(relationWithOwnerItems), //MapToList(loginInfo.officers),
-            selected: officersController,
-            onChanged: (selectedValue) {
-              _onChanged(selectedValue);
-              //pollutantRegisterModel.officerId=int.parse(selectedValue['id']);
-            },
-          ),
-          ElevatedButton(
-              onPressed: (){
-                Navigator.push(context, MaterialPageRoute(builder: (context) => PollutantRegister()));
+      body: SafeArea(
+        child: Column(
+          children: [
+            DropdownList(key:GlobalKey(),
+              title: "افسر شیفت",
+              items: MapConvertor.MapToList(relationWithOwnerItems), //  MapToList(relationWithOwnerItems), //MapToList(loginInfo.officers),
+              selected: officersController,
+              onChanged: (selectedValue) {
+                _onChanged(selectedValue);
+                //pollutantRegisterModel.officerId=int.parse(selectedValue['id']);
               },
-              child: Row(children: [Text('ورود'),Icon(Icons.clear) ],)
-          )
-        ],
+            ),
+            ElevatedButton(
+                onPressed: (){
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => LandingPage()));
+                },
+                child: Row(children: [Text('ورود'),Icon(Icons.clear) ],)
+            )
+          ],
+        ),
       ),
     );
 

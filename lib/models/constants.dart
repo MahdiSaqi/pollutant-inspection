@@ -21,6 +21,8 @@ class Constants {
   static const String callBackUri="https://login.mashhad.ir/login.aspx";
 
   static const String getLoginData= "api/sima/login";//"api/sima/login";
+  static const String getBaseDefinition= "api/sima/Definitions";
+
 
 
   static const String registerPollutantPath="api/SIMA/Notice/Register";//"api/SIMA/Notice/Register";

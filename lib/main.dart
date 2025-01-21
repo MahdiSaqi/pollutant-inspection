@@ -74,22 +74,21 @@ class _NavigateToWebLoginState extends State<NavigateToWebLogin> {
   }
   Future<void> _initialize() async {
     prefs = await SharedPreferences.getInstance();
-    String? strLoginInfo = prefs?.getString('loginInfo');
-    Map<String,dynamic>? loginInfo;
-    try{
-      loginInfo = jsonDecode(strLoginInfo!);
-    } catch(e) {
-
-    }
+    String? token = prefs?.getString('token');
 
 
-    if(loginInfo != null)
+    if(token != null)
       {
-        var baseDef =await GetBaseDefinitions().getData(loginInfo['token']);
-        prefs?.setString('baseDefinitions', baseDef!);
-        Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => LandingPage() /*PollutantRegister(loginInfo: loginInfo,)*/));
+        var baseDef =await GetBaseDefinitions().getData(token);
+        if(baseDef=="400")
+          {
+            loginKey();
+          }else{
+          prefs?.setString('baseDefinitions', baseDef!);
+          Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => LandingPage() /*PollutantRegister(loginInfo: loginInfo,)*/));
+        }
 
       }
     else

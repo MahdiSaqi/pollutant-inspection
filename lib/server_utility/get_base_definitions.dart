@@ -8,7 +8,7 @@ class GetBaseDefinitions {
 
   Future<String?> getData(String? token)  async {
     try {
-        var url = Uri.http(Constants.baseURL, Constants.getLoginData ,{'token':token});
+        var url = Uri.http(Constants.baseURL, Constants.getBaseDefinition ,{'token':token});
         print("url get login data : " +  url.toString());
         var res = await http.get(url)
             .timeout(
@@ -26,7 +26,9 @@ class GetBaseDefinitions {
             if(mapRes['statusCode']==0)
               {
                 return mapRes['data'];
-              }
+              }else{
+                return '400';
+            }
           }
 
         //SIMABaseDefinition? simaBaseDefinition;

@@ -42,25 +42,22 @@ class WebLogin extends StatelessWidget {
           },
           onPageFinished: (String url) async {
             debugPrint('Page finished loading: $url');
-            if(true/*url==Constants.callBackUri*/)
+            Uri uri = Uri.parse(url);
+            String? token = uri.queryParameters['t'];
+            if(token != null)
             {
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              prefs.setString('token', token);
               // Navigator.pop(context);
               //TODO     مقداار توکن باید از رشته آدرس برگشتی استخراج شود
-              Uri uri = Uri.parse(url);
-              String? token = uri.queryParameters['t'];
-              print(token);
-
-
               Loading.open(context);
               var loginInfo=await GetLoginInfo().getData(token);
-              print("login infoooooooooooooo  "+loginInfo.toString());
+              print("login infoooooooooooooo"+loginInfo.toString());
               Loading.close(context);
 
               if(loginInfo!=null)
               {
-                  SharedPreferences prefs = await SharedPreferences.getInstance();
                   prefs.setString('loginInfo', jsonEncode(loginInfo));
-
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => OfficerSelection() /*PollutantRegister(loginInfo: loginInfo,)*/),
