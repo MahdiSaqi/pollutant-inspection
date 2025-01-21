@@ -1,0 +1,5 @@
+enum PollutionAnalyzeMethod
+{
+  ByAnalizer,
+  Manual
+}
