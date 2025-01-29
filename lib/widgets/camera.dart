@@ -1,7 +1,8 @@
-import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:image/image.dart' as img;
 
 class PictureForm extends StatefulWidget {
   final String labelText; // Optional label text for the picture field
@@ -16,9 +17,14 @@ class _PictureFormState extends State<PictureForm> {
 
   Future<void> _pickImage() async {
     final XFile? pickedImage = await ImagePicker().pickImage(source: ImageSource.camera);
+
+    // final originalImage = img.decodeImage(pickedImage as Uint8List);
+    // final newImage = img.copyResize(originalImage!, width: originalImage.width, height: originalImage.height);
+    // img.drawString(newImage,  "textToWrite" , font: img.BitmapFont.fromFnt("arial",newImage));
     setState(() {
       if (pickedImage != null) {
         _imageFile = File(pickedImage.path);
+        // _imageFile = File(newImage as String);
       }
     });
     // final bytes = await _imageFile!.readAsBytes();

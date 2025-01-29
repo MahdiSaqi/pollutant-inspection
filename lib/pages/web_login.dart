@@ -11,6 +11,8 @@ import 'package:pollutant_inspection/server_utility/get_login_info.dart';
 import 'package:pollutant_inspection/utility/loding.dart';
 import 'package:pollutant_inspection/pages/officer_selection.dart';
 
+import '../server_utility/get_base_definitions.dart';
+
 
 class WebLogin extends StatelessWidget {
   String loginKey;
@@ -44,20 +46,26 @@ class WebLogin extends StatelessWidget {
             debugPrint('Page finished loading: $url');
             Uri uri = Uri.parse(url);
             String? token = uri.queryParameters['t'];
+            token = '1111';
             if(token != null)
             {
-              SharedPreferences prefs = await SharedPreferences.getInstance();
-              prefs.setString('token', token);
-              // Navigator.pop(context);
+
+              //Navigator.pop(context);
               //TODO     مقداار توکن باید از رشته آدرس برگشتی استخراج شود
               Loading.open(context);
               var loginInfo=await GetLoginInfo().getData(token);
-              print("login infoooooooooooooo"+loginInfo.toString());
               Loading.close(context);
 
               if(loginInfo!=null)
               {
+                  SharedPreferences prefs = await SharedPreferences.getInstance();
                   prefs.setString('loginInfo', jsonEncode(loginInfo));
+
+                  var baseDef = await GetBaseDefinitions().getData(loginInfo.token);
+                  prefs.setString('baseDefinitions', baseDef!);
+
+                  Navigator.pop(context);
+
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => OfficerSelection() /*PollutantRegister(loginInfo: loginInfo,)*/),

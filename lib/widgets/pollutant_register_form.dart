@@ -25,11 +25,11 @@ import 'package:pollutant_inspection/widgets/form_field.dart';
 import 'package:pollutant_inspection/widgets/dropdown_field.dart';
 import 'package:pollutant_inspection/widgets/lsplate.dart';
 import 'package:pollutant_inspection/utility/map_to_list.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/base_definitionDTO.dart';
 
 class PollutantRegisterForm extends StatefulWidget {
-
   // SIMALoginInfo loginInfo;
   // PollutantRegisterForm({required this.loginInfo});
 
@@ -40,21 +40,22 @@ class PollutantRegisterForm extends StatefulWidget {
 }
 
 class PollutantRegisterFormState extends State<PollutantRegisterForm> {
+  var pollutantRegisterModel = PollutantRegisterModel();
 
-  var pollutantRegisterModel=PollutantRegisterModel();
   // SIMALoginInfo loginInfo;
   // PollutantRegisterFormState(/*{required this.loginInfo}*/);
-  static const String noneSelection='بدون انتخاب';
+  static const String noneSelection = 'بدون انتخاب';
   String _selectedDate = Jalali.now().toJalaliDateTime();
   File? _base64Image;
-  bool hasTech=false;//برای مشاهده یا عدم مشاهده مراکز معاینه فنی
-  bool hasAnalyzer=false;
+  bool hasTech = false; //برای مشاهده یا عدم مشاهده مراکز معاینه فنی
+  bool hasAnalyzer = false;
+  bool needTechnicalDiagnosis = false;
 
   // Note: This is a `GlobalKey<FormState>`,
   // not a GlobalKey<MyCustomFormState>.
   final _formKey = GlobalKey<FormState>();
 
-  List<BaseDefinitionDTO> relationWithOwnerItems=[
+  List<BaseDefinitionDTO> relationWithOwnerItems = [
     BaseDefinitionDTO(id: "0", title: "مالک"),
     BaseDefinitionDTO(id: "1", title: 'پیمانکار'),
     BaseDefinitionDTO(id: "2", title: 'راننده'),
@@ -81,16 +82,29 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
     BaseDefinitionDTO(id: '9', title: 'درخواست توقیف پلاک'),
   ];
 
-  List<BaseDefinitionDTO> cityItems = [
-    BaseDefinitionDTO(id: '0', title: 'مشهد')
+  List<BaseDefinitionDTO> districtItems = [
+    BaseDefinitionDTO(id: '0', title: 'منطقه 1'),
+    BaseDefinitionDTO(id: '0', title: 'منطقه 2'),
+    BaseDefinitionDTO(id: '0', title: 'منطقه 3'),
+    BaseDefinitionDTO(id: '0', title: 'منطقه 4'),
+    BaseDefinitionDTO(id: '0', title: 'منطقه 5'),
+    BaseDefinitionDTO(id: '0', title: 'منطقه 6'),
+    BaseDefinitionDTO(id: '0', title: 'منطقه 7'),
+    BaseDefinitionDTO(id: '0', title: 'منطقه 8'),
+    BaseDefinitionDTO(id: '0', title: 'منطقه 9'),
+    BaseDefinitionDTO(id: '0', title: 'منطقه 10'),
+    BaseDefinitionDTO(id: '0', title: 'منطقه 11'),
+    BaseDefinitionDTO(id: '0', title: 'منطقه 12'),
+    BaseDefinitionDTO(id: '0', title: 'منطقه ثامن'),
+    BaseDefinitionDTO(id: '0', title: 'خارج از شهر'),
   ];
-  List<BaseDefinitionDTO> fuelTypeItems = [
-    BaseDefinitionDTO(id: '0', title: 'دوگانه'),
+  List<BaseDefinitionDTO> engineTypeItems = [
+    //BaseDefinitionDTO(id: '0', title: 'دوگانه'),
     BaseDefinitionDTO(id: '1', title: 'بنزین'),
     BaseDefinitionDTO(id: '2', title: 'گازوئیل'),
   ];
   List<BaseDefinitionDTO> fuelingTypeItems = [
-    BaseDefinitionDTO(id: '0', title: 'نامشخص'),
+    //BaseDefinitionDTO(id: '0', title: 'نامشخص'),
     BaseDefinitionDTO(id: '1', title: 'انژکتور'),
     BaseDefinitionDTO(id: '2', title: 'کاربراتور'),
   ];
@@ -104,39 +118,79 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
     BaseDefinitionDTO(id: '0', title: 'مشاهده چشمی'),
     BaseDefinitionDTO(id: '1', title: 'دستگاه آنالایزر'),
   ];
+  List<BaseDefinitionDTO> pollutantTypeItems = [
+    BaseDefinitionDTO(id: '0', title: 'روغن سوزی'),
+    BaseDefinitionDTO(id: '1', title: 'خام سوزی'),
+  ];
 
-  TextEditingController
-      officersController=TextEditingController(text: "0",),
+
+  ///load from storage(sharedPreferences)
+  List<BaseDefinitionDTO> carTypes = [
+    BaseDefinitionDTO(id: '0', title: 'عدم دریافت لیست')
+  ];
+
+  ///load from storage(sharedPreferences)
+  List<BaseDefinitionDTO> technicalCenters = [
+    BaseDefinitionDTO(id: '0', title: 'عدم دریافت لیست')
+  ];
+
+  String officerName = "نام افسر انتخاب نشده است";
+
+  TextEditingController officersController = TextEditingController(
+        text: "0",
+      ),
       relationWithOwnerController = TextEditingController(text: "0"),
-      nameController=TextEditingController(),
-      familyController=TextEditingController(),
-      driverNationalCodeController=TextEditingController(),
-      driverMobileController=TextEditingController(),
-      driverDriveLicenseController=TextEditingController(),
-      recordedDocumentController=TextEditingController(text: "0"),
-      cityController=TextEditingController(text: "0"),
-      driverAddressController=TextEditingController(),
-      fuelTypeController=TextEditingController(text: "0"),
-      fuelingTypeController=TextEditingController(text: "0"),
-      hasTechnicalDiagnosisController=TextEditingController(text: "0"),
-      analyzeMethodController=TextEditingController(text: "0"),
-      carTypesController=TextEditingController(text: "0"),
-      carModelController=TextEditingController(text: ""),
-      technicalCentersController=TextEditingController(text: "0"),
-      sourceCategoriesController=TextEditingController(text: "0"),
-      dateController=TextEditingController(text: "0"),
-        //plate controllers
-      twoDigit=TextEditingController(text: ""),
-      letter=TextEditingController(text: "-"),
-      threeDigit=TextEditingController(text: ""),
-      iranDigit=TextEditingController(text: ""),
-        //analyzer values
-      O2Controller=TextEditingController(text: ""),
-      LambdaController=TextEditingController(text: ""),
-      COController=TextEditingController(text: ""),
-      HCController=TextEditingController(text: "");
+      nameController = TextEditingController(),
+      familyController = TextEditingController(),
+      driverNationalCodeController = TextEditingController(),
+      driverMobileController = TextEditingController(),
+      driverDriveLicenseController = TextEditingController(),
+      recordedDocumentController = TextEditingController(text: "0"),
+      districtController = TextEditingController(text: "0"),
+      driverAddressController = TextEditingController(),
+      engineTypeController = TextEditingController(text: "0"),
+      fuelingTypeController = TextEditingController(text: "0"),
+      hasTechnicalDiagnosisController = TextEditingController(text: "0"),
+      analyzeMethodController = TextEditingController(text: "0"),
+      pollutantTypeController = TextEditingController(text: "0"),
+      carTypesController = TextEditingController(text: "0"),
+      carModelController = TextEditingController(text: ""),
+      technicalCentersController = TextEditingController(text: "0"),
+      sourceCategoriesController = TextEditingController(text: "0"),
+      dateController = TextEditingController(text: "0"),
+      //plate controllers
+      twoDigit = TextEditingController(text: ""),
+      letter = TextEditingController(text: "-"),
+      threeDigit = TextEditingController(text: ""),
+      iranDigit = TextEditingController(text: ""),
+      //analyzer values
+      O2Controller = TextEditingController(text: ""),
+      LambdaController = TextEditingController(text: ""),
+      COController = TextEditingController(text: ""),
+      HCController = TextEditingController(text: "");
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    _initialize();
+    super.initState();
+  }
 
+  _initialize() async {
+    var prefs = await SharedPreferences.getInstance();
+    var strBaseDef = prefs.getString('baseDefinitions');
+    if (strBaseDef != null) {
+      var baseDef = jsonDecode(strBaseDef);
+      setState(() {
+        carTypes = List<BaseDefinitionDTO>.from(baseDef['carTypes']
+            .map((item) => BaseDefinitionDTO.fromJson(item)));
+        technicalCenters = List<BaseDefinitionDTO>.from(
+            baseDef['technicalCenters']
+                .map((item) => BaseDefinitionDTO.fromJson(item)));
+        officerName = prefs.getString('officerName') as String;
+      });
+    }
+  }
 
   void handleImageSelected(File? base64Image) {
     setState(() {
@@ -157,16 +211,14 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
   //   return res.toList();
   // }
 
-  dynamic _onChanged(dynamic selectedValue)
-  {
+  dynamic _onChanged(dynamic selectedValue) {
     // print("hasTech..."+hasTechnicalDiagnosisController.text);
     print("Selected Value: ${selectedValue['value']}");
     print("Selected id: ${selectedValue['id']}");
     print("Selected title: ${selectedValue['title']}");
   }
 
-  void ShowModalErrors(String title,String content)
-  {
+  void ShowModalErrors(String title, String content) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -178,9 +230,10 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
             content: Text(content),
             actions: [
               CloseButton(
-                onPressed: (){
-                Navigator.pop(context);
-              },)
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              )
               // cancelButton,
               // continueButton,
             ],
@@ -189,7 +242,8 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
       },
     );
   }
-  void _clearForm(){
+
+  void _clearForm() {
     driverNationalCodeController.clear();
     nameController.clear();
     familyController.clear();
@@ -197,233 +251,388 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
     driverAddressController.clear();
     driverDriveLicenseController.clear();
     carModelController.clear();
-    twoDigit.clear();threeDigit.clear();iranDigit.clear();
+    twoDigit.clear();
+    threeDigit.clear();
+    iranDigit.clear();
 
     setState(() {
       // officersController.text="0"; //چون در همه ثبت های آن لاگین افسر شیفت تغییر نمی کند
-      cityController.text="0";
-      relationWithOwnerController.text="0";
-      recordedDocumentController.text="0";
-      carTypesController.text="0";
-      fuelTypeController.text="0";
-      fuelingTypeController.text="0";
-      sourceCategoriesController.text="0";
-      technicalCentersController.text="0";
-      analyzeMethodController.text="0";
-      hasTechnicalDiagnosisController.text="0";
-      letter.text="-";
-      hasTech=false;
-      hasAnalyzer=false;
-      _base64Image=null;
+      districtController.text = "0";
+      relationWithOwnerController.text = "0";
+      recordedDocumentController.text = "0";
+      carTypesController.text = "0";
+      engineTypeController.text = "0";
+      fuelingTypeController.text = "0";
+      sourceCategoriesController.text = "0";
+      technicalCentersController.text = "0";
+      analyzeMethodController.text = "0";
+      hasTechnicalDiagnosisController.text = "0";
+      letter.text = "-";
+      hasTech = false;
+      hasAnalyzer = false;
+      _base64Image = null;
     });
-    var tempOfficerID=pollutantRegisterModel.officerId;
-    pollutantRegisterModel=PollutantRegisterModel();
-    pollutantRegisterModel.officerId=tempOfficerID;
+    var tempOfficerID = pollutantRegisterModel.officerId;
+    pollutantRegisterModel = PollutantRegisterModel();
+    pollutantRegisterModel.officerId = tempOfficerID;
   }
 
   @override
   Widget build(BuildContext context) {
     return Form(
-      key:_formKey,
+      key: _formKey,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(height: 10,),
-          DropdownList(key:GlobalKey(),
-            title: "افسر شیفت",
-            items: MapConvertor.MapToList(relationWithOwnerItems), //MapConvertor.MapToList(loginInfo.officers),
-            selected: officersController,
-            onChanged: (selectedValue) {
-              _onChanged(selectedValue);
-              pollutantRegisterModel.officerId=int.parse(selectedValue['id']);
-            },
+          SizedBox(
+            height: 10,
           ),
+          // DropdownList(
+          //   key: GlobalKey(),
+          //   title: "افسر شیفت",
+          //   items: MapConvertor.MapToList(relationWithOwnerItems),
+          //   //MapConvertor.MapToList(loginInfo.officers),
+          //   selected: officersController,
+          //   onChanged: (selectedValue) {
+          //     _onChanged(selectedValue);
+          //     pollutantRegisterModel.officerId = int.parse(selectedValue['id']);
+          //   },
+          // ),
+          Text("افسر شیفت : " + officerName),
           LSPlate(
               twoDigit: twoDigit,
               letter: letter,
               threeDigit: threeDigit,
               iranDigit: iranDigit,
-              color: Colors.white
+              color: Colors.white),
+          DropdownList(
+            key: GlobalKey(),
+            title: "نوع موتور خودرو",
+            items: MapConvertor.MapToList(engineTypeItems),
+            selected: engineTypeController,
+            onChanged: (selectedValue) {
+              _onChanged(selectedValue);
+              setState(() {
+                pollutantRegisterModel.fuel = int.parse(selectedValue['id']);
+              });
+
+            },
           ),
+          DropdownList(
+            key: GlobalKey(),
+            title: "نوع سوخت رسانی",
+            items: MapConvertor.MapToList(fuelingTypeItems),
+            selected: fuelingTypeController,
+            onChanged: (selectedValue) {
+              _onChanged(selectedValue);
+              pollutantRegisterModel.fuelType = int.parse(selectedValue['id']);
+            },
+          ),
+          DropdownList(
+            key: GlobalKey(),
+            title: "نوع خودرو",
+            items: MapConvertor.MapToList(carTypes),
+            //MapConvertor.MapToList(loginInfo.carTypes),
+            selected: carTypesController,
+            onChanged: (selectedValue) {
+              _onChanged(selectedValue);
+              pollutantRegisterModel.carTypeId = int.parse(selectedValue['id']);
+            },
+          ),
+          // YearPicker(
+          //     firstDate: DateTime(1400),
+          //     lastDate: DateTime(1420),
+          //     selectedDate: DateTime(1400),
+          //     onChanged: (selected) {}),
+
+          MyFormField(
+            labelText: 'مدل خودرو',
+            controller: carModelController,
+            onTap: () async {
+              carModelController.text = await showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return Dialog(
+                      child: YearPicker(
+                        firstDate: DateTime(1300),
+                        lastDate: DateTime(Jalali.now().year + 1),
+                        selectedDate: DateTime(Jalali.now().year - 4),
+                        onChanged: (DateTime selectedDate) {
+                          setState(() {
+                            carModelController.text =
+                                selectedDate.year.toString();
+                            if (selectedDate.year < (Jalali.now().year - 5))
+                              needTechnicalDiagnosis = true;
+                            else
+                              needTechnicalDiagnosis = false;
+                            // Return the selected year
+                          });
+                          Navigator.of(context).pop(selectedDate.year);
+                        },
+                      ),
+                    );
+                  });
+            },
+          ),
+
+          // MyFormField(
+          //   labelText: 'مدل خودرو',
+          //   controller: carModelController,
+          //   keyboardType: TextInputType.number,
+          //   maxLength: 4,
+          // ),
+          MyFormField(
+            labelText: 'نام راننده',
+            controller: nameController,
+          ),
+
+          MyFormField(
+            labelText: 'نام خانوادگی راننده',
+            controller: familyController,
+          ),
+
           MyFormField(
             labelText: 'کد ملی راننده',
             controller: driverNationalCodeController,
             keyboardType: TextInputType.number,
             maxLength: 10,
             validator: (String? value) {
-              if(value!.isEmpty || value.length!=10 || !value.contains(RegExp(r'^[0-9]')))
+              if (value!.isEmpty ||
+                  value.length != 10 ||
+                  !value.contains(RegExp(r'^[0-9]')))
                 return 'کد ملی  به درستی وارد شود';
             },
           ),
-          MyFormField(labelText: 'نام راننده',controller: nameController,),
-          MyFormField(labelText: 'نام خانوادگی راننده',controller: familyController,),
-          MyFormField(
-            labelText: 'تلفن همراه',
-            controller: driverMobileController,
-            keyboardType: TextInputType.number,
-            maxLength: 11,
-          ),
-          MyFormField(
-            labelText: 'مدل خودرو',
-            controller: carModelController,
-            keyboardType: TextInputType.number,
-            maxLength: 4,
-          ),
-          MyFormField(labelText: 'شماره گواهی نامه',controller: driverDriveLicenseController,),
-          MyFormField(labelText: 'آدرس',controller: driverAddressController,),
-          DropdownList(key:GlobalKey(),
-            title: "شهر محل سکونت",
-            items: MapConvertor.MapToList(cityItems),
-            selected: cityController,
-            onChanged:(selectedValue) {_onChanged(selectedValue);},
-          ),
-
-          DropdownList(key:GlobalKey(),
+          DropdownList(
+            key: GlobalKey(),
             title: "نسبت با مالک",
             // items: relationWithOwnerItems,
             items: MapConvertor.MapToList(relationWithOwnerItems),
             selected: relationWithOwnerController,
             onChanged: (selectedValue) {
               _onChanged(selectedValue);
-              pollutantRegisterModel.relationWithOwner=int.parse(selectedValue['id']);
-            },
-          ),
-          DropdownList(key:GlobalKey(),
-            title: "مدرک ضبط شده",
-            items: MapConvertor.MapToList(recordedDocumentItems) ,
-            selected: recordedDocumentController,
-            onChanged: (selectedValue) {
-              _onChanged(selectedValue);
-              pollutantRegisterModel.recordedDocument=int.parse(selectedValue['id']);
-            },
-          ),
-          DropdownList(key:GlobalKey(),
-            title: "نوع خودرو",
-            items:MapConvertor.MapToList(relationWithOwnerItems), //MapConvertor.MapToList(loginInfo.carTypes),
-            selected: carTypesController,
-            onChanged: (selectedValue) {
-              _onChanged(selectedValue);
-              pollutantRegisterModel.carTypeId=int.parse(selectedValue['id']);
+              pollutantRegisterModel.relationWithOwner =
+                  int.parse(selectedValue['id']);
             },
           ),
 
-          DropdownList(key:GlobalKey(),
-            title: "نوع سوخت",
-            items: MapConvertor.MapToList(fuelTypeItems) ,
-            selected: fuelTypeController,
-            onChanged: (selectedValue) {
-              _onChanged(selectedValue);
-              pollutantRegisterModel.fuel=int.parse(selectedValue['id']) ;
-            },
+          MyFormField(
+            labelText: 'تلفن همراه',
+            controller: driverMobileController,
+            keyboardType: TextInputType.number,
+            maxLength: 11,
           ),
-          DropdownList(key:GlobalKey(),
-            title: "نوع سوخت رسانی",
-            items: MapConvertor.MapToList(fuelingTypeItems) ,
-            selected: fuelingTypeController,
-            onChanged:(selectedValue) {
-              _onChanged(selectedValue);
-              pollutantRegisterModel.fuelType=int.parse(selectedValue['id']) ;
-            },
-          ),
-          DropdownList(key:GlobalKey(),
-            title: "نوع منبع",
-            items: MapConvertor.MapToList(relationWithOwnerItems),// MapConvertor.MapToList(loginInfo.sourceCategories),
-            selected: sourceCategoriesController,
-            onChanged:(selectedValue) {
-              _onChanged(selectedValue);
-              pollutantRegisterModel.sourceCategoryId=int.parse(selectedValue['id']) ;
-            },
-          ),
-
-          DropdownList(key:GlobalKey(),
-            title: "داشتن معاینه فنی",
-            items: MapConvertor.MapToList(hasTechnicalDiagnosisItems) ,
-            selected: hasTechnicalDiagnosisController,
-            onChanged: (selectedValue) {
-              _onChanged(selectedValue);
-              setState(() {
-                if(selectedValue['value']=="1")
-                  hasTech=true;
-                else
-                  hasTech=false;
-              });
-              if(selectedValue['id']!=null)
-                pollutantRegisterModel.hasTechnicalDiagnosis=bool.parse(selectedValue['id']);
-              else
-                pollutantRegisterModel.hasTechnicalDiagnosis=false;
-            },
-          ),
-          if(hasTech==true) MyFormField(
-            keyboardType: TextInputType.none,
-            labelText: "تاریخ اخذ معاینه فنی",
-            controller: dateController,
-            onTap: ()async{
-              Jalali? picked = await showPersianDatePicker(
-                  context: context,
-                  initialDate: Jalali.now(),
-                  firstDate: Jalali(1400, 1),
-                  lastDate: Jalali.now(),//Jalali(1450, 9),
-                  initialEntryMode: PDatePickerEntryMode.calendarOnly,
-                  initialDatePickerMode: PDatePickerMode.year,
-                  builder: (context, child) {
-                    return Theme(
-                      data: ThemeData(
-                        dialogTheme: const DialogTheme(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(
-                                Radius.circular(0)),
-                          ),
-                        ),
-                      ),
-                      child: child!,
-                    );
-                  });
-
-              if (picked != null && picked != _selectedDate) {
-                setState(() {
-                  dateController.text = picked.formatCompactDate();
-                  pollutantRegisterModel.technicalDiagnosisDateTime=picked.toDateTime().toString();
-                  print(picked.toDateTime());
-                  print(pollutantRegisterModel.technicalDiagnosisDateTime);
-                });
-              }
-
-            },
-          ),
-          if(hasTech==true) DropdownList(key:GlobalKey(),
-            title: "مرکز معاینه فنی",
-            items: MapConvertor.MapToList(relationWithOwnerItems), //MapConvertor.MapToList(loginInfo.technicalCenters),
-            selected: technicalCentersController,
-            onChanged: (selectedValue) {
-              _onChanged(selectedValue);
-              pollutantRegisterModel.technicalDiagnosisCenterId=int.parse(selectedValue['id']);
-            },
-          ),
-          DropdownList(key:GlobalKey(),
+          // MyFormField(
+          //   labelText: 'شماره گواهی نامه',
+          //   controller: driverDriveLicenseController,
+          // ),
+          DropdownList(
+            key: GlobalKey(),
             title: "روش سنجش آلایندگی",
-            items: MapConvertor.MapToList(analyzeMethodItems) ,
+            items: MapConvertor.MapToList(analyzeMethodItems),
             selected: analyzeMethodController,
             onChanged: (selectedValue) {
               _onChanged(selectedValue);
               setState(() {
-                if(selectedValue['value']=="2")
-                  hasAnalyzer=true;
+                if (selectedValue['value'] == "2")
+                  hasAnalyzer = true;
                 else
-                  hasAnalyzer=false;
+                  hasAnalyzer = false;
               });
-              pollutantRegisterModel.pollutionAnalyzeMethod=int.parse(selectedValue['id']) ;
+              pollutantRegisterModel.pollutionAnalyzeMethod =
+                  int.parse(selectedValue['id']);
+            },
+          ),
+          if(!hasAnalyzer)
+          DropdownList(
+            key: GlobalKey(),
+            title: "نوع آلایندگی",
+            items: MapConvertor.MapToList(pollutantTypeItems),
+            selected: pollutantTypeController,
+            onChanged: (selectedValue) {
+              _onChanged(selectedValue);
+              setState(() {
+                                  ///TODO -------------------
+              });
+              pollutantRegisterModel.pollutionAnalyzeMethod =
+                  int.parse(selectedValue['id']);
             },
           ),
 
-          //TODO کنترلر 4 مورد زیر اضافه شود
-          if(hasAnalyzer==true) MyFormField(labelText: 'O2',controller: O2Controller,keyboardType: TextInputType.number,),
-          if(hasAnalyzer==true) MyFormField(labelText: 'lambda',controller: LambdaController,keyboardType: TextInputType.number,),
-          if(hasAnalyzer==true) MyFormField(labelText: 'CO',controller: COController,keyboardType: TextInputType.number,),
-          if(hasAnalyzer==true) MyFormField(labelText: 'HC',controller: HCController,keyboardType: TextInputType.number,),
+
+          if (pollutantRegisterModel.fuel==1 && hasAnalyzer)
+            MyFormField(
+              labelText: 'O2',
+              controller: O2Controller,
+              keyboardType: TextInputType.number,
+            ),
+          if (pollutantRegisterModel.fuel==1 && hasAnalyzer)
+            MyFormField(
+              labelText: 'lambda',
+              controller: LambdaController,
+              keyboardType: TextInputType.number,
+            ),
+          if (pollutantRegisterModel.fuel==1 && hasAnalyzer)
+            MyFormField(
+              labelText: 'CO',
+              controller: COController,
+              keyboardType: TextInputType.number,
+            ),
+          if (pollutantRegisterModel.fuel==1 && hasAnalyzer)
+            MyFormField(
+              labelText: 'HC',
+              controller: HCController,
+              keyboardType: TextInputType.number,
+            ),
+          if (pollutantRegisterModel.fuel==1 && hasAnalyzer)
+            MyFormField(
+              labelText: 'NO',
+              controller: HCController,///TODO -----------------
+              keyboardType: TextInputType.number,
+            ),
+          if (pollutantRegisterModel.fuel==1 && hasAnalyzer)
+            MyFormField(
+              labelText: 'CO2',
+              controller: HCController,///TODO ------------------
+              keyboardType: TextInputType.number,
+            ),
+          if (pollutantRegisterModel.fuel==2 && hasAnalyzer)
+            MyFormField(
+              labelText: 'Opacity',
+              controller: HCController,///TODO ------------------
+              keyboardType: TextInputType.number,
+            ),
+          if (pollutantRegisterModel.fuel==2 && hasAnalyzer)
+            MyFormField(
+              labelText: 'K',
+              controller: HCController,///TODO ------------------
+              keyboardType: TextInputType.number,
+            ),
 
 
 
-          PictureForm(labelText: 'تصویر مستند',onImageSelected: handleImageSelected,),
+
+
+          DropdownList(
+            key: GlobalKey(),
+            title: "مدرک ضبط شده",
+            items: MapConvertor.MapToList(recordedDocumentItems),
+            selected: recordedDocumentController,
+            onChanged: (selectedValue) {
+              _onChanged(selectedValue);
+              pollutantRegisterModel.recordedDocument =
+                  int.parse(selectedValue['id']);
+            },
+          ),
+
+          // DropdownList(
+          //   key: GlobalKey(),
+          //   title: "نوع منبع",
+          //   items: MapConvertor.MapToList(relationWithOwnerItems),
+          //   // MapConvertor.MapToList(loginInfo.sourceCategories),
+          //   selected: sourceCategoriesController,
+          //   onChanged: (selectedValue) {
+          //     _onChanged(selectedValue);
+          //     pollutantRegisterModel.sourceCategoryId =
+          //         int.parse(selectedValue['id']);
+          //   },
+          // ),
+          if (needTechnicalDiagnosis == true)
+            DropdownList(
+              key: GlobalKey(),
+              title: "داشتن معاینه فنی",
+              items: MapConvertor.MapToList(hasTechnicalDiagnosisItems),
+              selected: hasTechnicalDiagnosisController,
+              onChanged: (selectedValue) {
+                _onChanged(selectedValue);
+                setState(() {
+                  if (selectedValue['value'] == "1")
+                    hasTech = true;
+                  else
+                    hasTech = false;
+                });
+                if (selectedValue['id'] != null)
+                  pollutantRegisterModel.hasTechnicalDiagnosis =
+                      bool.parse(selectedValue['id']);
+                else
+                  pollutantRegisterModel.hasTechnicalDiagnosis = false;
+              },
+            )
+          else
+            Text('معاینه فنی نیاز ندارد'),
+
+          if (hasTech == true)
+            MyFormField(
+              keyboardType: TextInputType.none,
+              labelText: "تاریخ اخذ معاینه فنی",
+              controller: dateController,
+              onTap: () async {
+                Jalali? picked = await showPersianDatePicker(
+                    context: context,
+                    initialDate: Jalali.now(),
+                    firstDate: Jalali(1400, 1),
+                    lastDate: Jalali.now(),
+                    //Jalali(1450, 9),
+                    initialEntryMode: PDatePickerEntryMode.calendarOnly,
+                    initialDatePickerMode: PDatePickerMode.year,
+                    builder: (context, child) {
+                      return Theme(
+                        data: ThemeData(
+                          dialogTheme: const DialogTheme(
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(0)),
+                            ),
+                          ),
+                        ),
+                        child: child!,
+                      );
+                    });
+
+                if (picked != null && picked != _selectedDate) {
+                  setState(() {
+                    dateController.text = picked.formatCompactDate();
+                    pollutantRegisterModel.technicalDiagnosisDateTime =
+                        picked.toDateTime().toString();
+                    print(picked.toDateTime());
+                    print(pollutantRegisterModel.technicalDiagnosisDateTime);
+                  });
+                }
+              },
+            ),
+          if (hasTech == true)
+            DropdownList(
+              key: GlobalKey(),
+              title: "مرکز معاینه فنی",
+              items: MapConvertor.MapToList(technicalCenters),
+              //MapConvertor.MapToList(loginInfo.technicalCenters),
+              selected: technicalCentersController,
+              onChanged: (selectedValue) {
+                _onChanged(selectedValue);
+                pollutantRegisterModel.technicalDiagnosisCenterId =
+                    int.parse(selectedValue['id']);
+              },
+            ),
+
+          DropdownList(
+            key: GlobalKey(),
+            title: "منطقه شهری محل سکونت",
+            items: MapConvertor.MapToList(districtItems),
+            selected: districtController,
+            onChanged: (selectedValue) {
+              _onChanged(selectedValue);
+            },
+          ),
+
+          MyFormField(
+            labelText: 'نشانی',
+            controller: driverAddressController,
+          ),
+
+          PictureForm(
+            labelText: 'تصویر مستند',
+            onImageSelected: handleImageSelected,
+          ),
           if (_base64Image != null)
             Container(
               height: 300.0,
@@ -437,114 +646,127 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
               ),
             ),
 
-
-
-
           // DropDownField(),
           // DropDown2(),
           // DropdownEnum(),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-
               ElevatedButton(
-                  onPressed: ()async
-                  {
-                    pollutantRegisterModel.driverNationalCode=driverNationalCodeController.text;
-                    pollutantRegisterModel.driverName=nameController.text;
-                    pollutantRegisterModel.driverFamily=familyController.text;
-                    pollutantRegisterModel.driverMobile=driverMobileController.text;
-                    pollutantRegisterModel.driverAddress=driverAddressController.text;
-                    pollutantRegisterModel.driverDriveLicence=driverDriveLicenseController.text;
+                onPressed: () async {
+                  pollutantRegisterModel.driverNationalCode =
+                      driverNationalCodeController.text;
+                  pollutantRegisterModel.driverName = nameController.text;
+                  pollutantRegisterModel.driverFamily = familyController.text;
+                  pollutantRegisterModel.driverMobile =
+                      driverMobileController.text;
+                  pollutantRegisterModel.driverAddress =
+                      driverAddressController.text;
+                  pollutantRegisterModel.driverDriveLicence =
+                      driverDriveLicenseController.text;
 
-                    if(O2Controller.text.isNotEmpty) pollutantRegisterModel.o2Value=double.parse(O2Controller.text);
-                    if(LambdaController.text.isNotEmpty) pollutantRegisterModel.lambdaValue=double.parse(LambdaController.text);
-                    if(COController.text.isNotEmpty) pollutantRegisterModel.coValue=double.parse(COController.text);
-                    if(HCController.text.isNotEmpty) pollutantRegisterModel.hcValue=double.parse(HCController.text);
+                  if (O2Controller.text.isNotEmpty)
+                    pollutantRegisterModel.o2Value =
+                        double.parse(O2Controller.text);
+                  if (LambdaController.text.isNotEmpty)
+                    pollutantRegisterModel.lambdaValue =
+                        double.parse(LambdaController.text);
+                  if (COController.text.isNotEmpty)
+                    pollutantRegisterModel.coValue =
+                        double.parse(COController.text);
+                  if (HCController.text.isNotEmpty)
+                    pollutantRegisterModel.hcValue =
+                        double.parse(HCController.text);
 
-                    if(carModelController.text!="")
-                    {
-                      pollutantRegisterModel.carModel=int.parse(carModelController.text);
-                      print(carModelController.text);
+                  if (carModelController.text != "") {
+                    pollutantRegisterModel.carModel =
+                        int.parse(carModelController.text);
+                    print(carModelController.text);
+                  }
+                  pollutantRegisterModel.carPlate = twoDigit.text +
+                      letter.text +
+                      threeDigit.text +
+                      iranDigit.text;
+
+                  //convert File To base64 image string
+                  if (_base64Image != null) {
+                    final bytes = await _base64Image!.readAsBytes();
+                    pollutantRegisterModel.photo = base64Encode(bytes);
+                  }
+
+                  if (twoDigit.text.isEmpty ||
+                      threeDigit.text.isEmpty ||
+                      iranDigit.text.isEmpty ||
+                      letter.text == "-") {
+                    ShowModalErrors('لطفا موارد زیر را رعایت کنید',
+                        'پلاک را به درستی وارد کنید');
+                    return;
+                  }
+
+                  if (relationWithOwnerController.text == "0" ||
+                      fuelingTypeController.text == "0" ||
+                      analyzeMethodController.text == "0" ||
+                      sourceCategoriesController.text == "0" ||
+                      hasTechnicalDiagnosisController.text == "0" ||
+                      (hasTechnicalDiagnosisController.text == "1" &&
+                          technicalCentersController.text == "0") ||
+                      officersController.text == "0" ||
+                      recordedDocumentController.text == "0" ||
+                      carTypesController.text == "0" ||
+                      districtController.text == "0" ||
+                      engineTypeController.text == "0") {
+                    ShowModalErrors('لطفا موارد زیر را رعایت کنید',
+                        'گزینه های بدون انتخاب را انتخاب کنید');
+                    return;
+                  }
+
+                  // print(pollutantRegisterModel.relationWithOwner.index.toString()+"=====================relationWithOwner.index");
+                  // print(relationWithOwnerController.text);
+                  // print(pollutantRegisterModel.carTypeId.toString()+"============================car type id");
+                  Loading.open(context);
+                  var res =
+                      await PollutantInformation().send(pollutantRegisterModel);
+                  Loading.close(context);
+
+                  if (res != null && res.statusCode == 200) {
+                    var jsonRes = jsonDecode(res.body);
+                    if (jsonRes['statusCode'] == 0) {
+                      //TODO print
+                      print(jsonRes['body']);
+                      ShowModalErrors('ثبت شد', 'فرم تخلف با موفقیت ثبت شد.');
+                      _clearForm();
+                    } else {
+                      print(jsonRes);
+                      print(jsonRes['errors']);
+                      ShowModalErrors('لطفا موارد زیر را رعایت کنید',
+                          jsonRes['errors'].toString());
                     }
-                    pollutantRegisterModel.carPlate=twoDigit.text +letter.text +threeDigit.text +iranDigit.text;
-
-                    //convert File To base64 image string
-                    if(_base64Image!=null)
-                    {
-                      final bytes = await _base64Image!.readAsBytes();
-                      pollutantRegisterModel.photo = base64Encode(bytes);
-                    }
-
-
-                    if(twoDigit.text.isEmpty ||
-                        threeDigit.text.isEmpty ||
-                        iranDigit.text.isEmpty ||
-                        letter.text=="-"){
-                      ShowModalErrors('لطفا موارد زیر را رعایت کنید', 'پلاک را به درستی وارد کنید');
-                      return;
-                    }
-
-
-
-                    if(relationWithOwnerController.text=="0" ||
-                        fuelingTypeController.text=="0" ||
-                        analyzeMethodController.text=="0" ||
-                        sourceCategoriesController.text=="0" ||
-                        hasTechnicalDiagnosisController.text=="0" ||
-                        (hasTechnicalDiagnosisController.text=="1" && technicalCentersController.text=="0") ||
-                        officersController.text=="0" ||
-                        recordedDocumentController.text=="0" ||
-                        carTypesController.text=="0" ||
-                        cityController.text=="0" ||
-                        fuelTypeController.text=="0" ){
-                      ShowModalErrors('لطفا موارد زیر را رعایت کنید', 'گزینه های بدون انتخاب را انتخاب کنید');
-                      return;
-                    }
-
-
-
-                    // print(pollutantRegisterModel.relationWithOwner.index.toString()+"=====================relationWithOwner.index");
-                    // print(relationWithOwnerController.text);
-                    // print(pollutantRegisterModel.carTypeId.toString()+"============================car type id");
-                    Loading.open(context);
-                    var res=await PollutantInformation().send(pollutantRegisterModel);
-                    Loading.close(context);
-
-                    if(res!=null && res.statusCode==200)
-                    {
-                      var jsonRes=jsonDecode(res.body);
-                      if(jsonRes['statusCode']==0)
-                      {
-                        //TODO print
-                        print(jsonRes['body']);
-                        ShowModalErrors('ثبت شد','فرم تخلف با موفقیت ثبت شد.');
-                        _clearForm();
-                      }
-                      else
-                      {
-                        print(jsonRes);
-                        print(jsonRes['errors']);
-                        ShowModalErrors('لطفا موارد زیر را رعایت کنید', jsonRes['errors'].toString());
-                      }
-                    }
-                  },
-                  child: Row(children: [Text("   ارسال فرم  "),Icon(Icons.save)],),
+                  }
+                },
+                child: Row(
+                  children: [Text("   صدور اخطار  "), Icon(Icons.save)],
+                ),
               ),
-              SizedBox(width: 40,),
+              SizedBox(
+                width: 40,
+              ),
               ElevatedButton(
                   style: ButtonStyle(
-                    backgroundColor: MaterialStatePropertyAll(Colors.red),
-                    foregroundColor: MaterialStatePropertyAll(Colors.white)
-                  ),
-                  onPressed: (){
+                      backgroundColor: MaterialStatePropertyAll(Colors.red),
+                      foregroundColor: MaterialStatePropertyAll(Colors.white)),
+                  onPressed: () {
                     _clearForm();
                   },
-                  child: Row(children: [Text('بازنشانی'),Icon(Icons.clear) ],)
-              ),
-
-            ],),
-
+                  child: Row(
+                    children: [Text('بازنشانی'), Icon(Icons.clear)],
+                  )),
+            ],
+          ),
+          ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('رفتن به منوی اصلی'))
         ],
       ),
     );

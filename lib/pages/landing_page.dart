@@ -1,28 +1,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:pollutant_inspection/pages/pollutant_register.dart';
+import 'package:pollutant_inspection/widgets/logined_user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LandingPage extends StatelessWidget {
-  final String info="";
 
   LandingPage({Key? key}) : super(key: key) {
-    var loginInfo = _loadLoginInfo();
-
   }
-
-
-  Future<String?> _loadLoginInfo() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('loginInfo'); // Return the login info
-  }
-
-
-
-  @override
-  void initState() {
-  }
-
   @override
   Widget build(BuildContext context) {
     return  Scaffold(
@@ -35,7 +20,8 @@ class LandingPage extends StatelessWidget {
               // mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                 ElevatedButton(
+                LoginedUser(),
+                ElevatedButton(
                     onPressed: () {
                       Navigator.push(context,
                       MaterialPageRoute(builder: (context) => PollutantRegister()));
@@ -44,12 +30,17 @@ class LandingPage extends StatelessWidget {
                 ),
                 ElevatedButton(
                   onPressed: (){},
-                  child: Text('گزارش'),
+                  child: Text('گزارش عملیات'),
                 ),
                 ElevatedButton(
-                    onPressed: (){},
+                    onPressed: () async {
+                      var prefs = await SharedPreferences.getInstance();
+                      prefs.clear();
+
+
+                    },
                     child: Text('خروج از حساب کاربری'),
-                )
+                ),
               ],
             ),
           ],

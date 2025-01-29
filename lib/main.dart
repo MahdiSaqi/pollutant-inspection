@@ -13,25 +13,26 @@ import 'package:pollutant_inspection/utility/internet_checker.dart';
 import 'package:pollutant_inspection/utility/loding.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'models/constants.dart';//test http#1
-
+import 'models/constants.dart'; //test http#1
 
 void main() {
-  HttpOverrides.global = MyHttpOverrides();//test http#2
+  HttpOverrides.global = MyHttpOverrides(); //test http#2
   runApp(const MyApp());
 }
 
 //test http#3
-class MyHttpOverrides extends HttpOverrides{
+class MyHttpOverrides extends HttpOverrides {
   @override
-  HttpClient createHttpClient(SecurityContext? context){
+  HttpClient createHttpClient(SecurityContext? context) {
     return super.createHttpClient(context)
-      ..badCertificateCallback = (X509Certificate cert, String host, int port)=> true;
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
   }
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -49,6 +50,7 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
+
   final String title;
 
   @override
@@ -61,95 +63,101 @@ class NavigateToWebLogin extends StatefulWidget {
 }
 
 class _NavigateToWebLoginState extends State<NavigateToWebLogin> {
-  String loginMessage="...در حال ورود به صفحه لاگین";
+  String loginMessage = "...در حال ورود به صفحه لاگین";
   Timer? _timer;
-  bool isRetry=false;
+  bool isRetry = false;
   SharedPreferences? prefs;
-
 
   @override
   void initState() {
     super.initState();
     _initialize();
   }
+
   Future<void> _initialize() async {
-    prefs = await SharedPreferences.getInstance();
-    String? token = prefs?.getString('token');
-
-
-    if(token != null)
-      {
-        var baseDef =await GetBaseDefinitions().getData(token);
-        if(baseDef=="400")
-          {
-            loginKey();
-          }else{
+    try {
+      prefs = await SharedPreferences.getInstance();
+      String? strLoginInfo = prefs?.getString('loginInfo');
+      if (strLoginInfo != null) {
+        var loginInfo = jsonDecode(strLoginInfo);
+        var baseDef = await GetBaseDefinitions().getData(loginInfo['token']);
+        if (baseDef == "400") {
+          // loginKey();
+          ///is code for test on local
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => Container(child: WebLogin("test"))
+                  // PollutantRegister()
+                  ));
+        } else {
           prefs?.setString('baseDefinitions', baseDef!);
           Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => LandingPage() /*PollutantRegister(loginInfo: loginInfo,)*/));
+              MaterialPageRoute(builder: (context) => LandingPage()
+                  //OfficerSelection()
+                  ));
         }
-
+      } else {
+        //loginKey();
+        ///is code for test on local
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => Container(child: WebLogin("test"))
+                // PollutantRegister()
+                ));
       }
-    else
-      {
-        loginKey();
-      }
+    } catch (e) {
+      // loginKey();
 
+      ///is code for test on local
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => Container(child: WebLogin("test"))
+              // PollutantRegister()
+              ));
+    }
   }
 
-
-  loginKey()
-  {
-    _timer = new Timer(const Duration(milliseconds: 3000), () async{
-
-      if(await Internet.check()==false)
-        {
-          setState(() {
-            isRetry=true;
-            loginMessage='اتصال به اینترنت را بررسی کنید';
-          });
-          return;
-        }
+  loginKey() {
+    _timer = new Timer(const Duration(milliseconds: 3000), () async {
+      if (await Internet.check() == false) {
+        setState(() {
+          isRetry = true;
+          loginMessage = 'اتصال به اینترنت را بررسی کنید';
+        });
+        return;
+      }
       Loading.open(context);
-      var res=await Login().getLoginKey();
+      var res = await Login().getLoginKey();
       Loading.close(context);
 
-      if(res!=null && res.statusCode==0)
-      {
+      if (res != null && res.statusCode == 0) {
         Navigator.pop(context);
 
         Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) =>
-                Container(
-                    child:WebLogin(res.data!)
-                )
-              // PollutantRegister()
-            )
-        );
-      }
-      else
-      {
+            MaterialPageRoute(
+                builder: (context) => Container(child: WebLogin(res.data!))
+                // PollutantRegister()
+                ));
+      } else {
         setState(() {
-          isRetry=true;
-          if(res!=null)
-          {
+          isRetry = true;
+          if (res != null) {
             // print(res.statusCode);
-            loginMessage="";
-            for(var i in res.errors!)
-              loginMessage+=i+"\n";
-          }
-          else
-          {
-            loginMessage='خطای ناشناخته!';
+            loginMessage = "";
+            for (var i in res.errors!) loginMessage += i + "\n";
+          } else {
+            loginMessage = 'خطای ناشناخته!';
             //TODO print
             print(res);
           }
         });
       }
     });
-
   }
 
   @override
@@ -163,17 +171,18 @@ class _NavigateToWebLoginState extends State<NavigateToWebLogin> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        if(isRetry==false) CircularProgressIndicator(),
+        if (isRetry == false) CircularProgressIndicator(),
         Text(loginMessage),
-        if(isRetry==true) ElevatedButton(
-            onPressed:(){
-              setState(() {
-                isRetry=false;
-                loginMessage="ورود به صفحه لاگین";
-              });
-              loginKey();
-            },
-            child: Text("تلاش مجدد"))
+        if (isRetry == true)
+          ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  isRetry = false;
+                  loginMessage = "ورود به صفحه لاگین";
+                });
+                loginKey();
+              },
+              child: Text("تلاش مجدد"))
       ],
     );
   }
@@ -191,11 +200,10 @@ class _MyHomePageState extends State<MyHomePage> {
             Text(widget.title),
           ],
         ),
-
       ),
       body: Center(
         child: NavigateToWebLogin(),
-        ),
-      );
+      ),
+    );
   }
 }

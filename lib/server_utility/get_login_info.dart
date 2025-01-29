@@ -10,7 +10,7 @@ import '../models/my_http_response.dart';
 class GetLoginInfo {
   Future<SIMALoginInfo?> getData(String? token) async {
     try {
-      var url = Uri.http(Constants.baseURL, Constants.getLoginData ,{'token':token});
+      var url = Uri.https(Constants.baseURL, Constants.getLoginData ,{'token':token});
       print("url get login data : " +  url.toString());
       var res = await http.get(url)
           .timeout(
@@ -46,6 +46,7 @@ class GetLoginInfo {
     }
     catch(e)
     {
+      print(e);
       // throw;
     }
   }

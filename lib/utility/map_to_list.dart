@@ -3,7 +3,7 @@ import '../models/base_definitionDTO.dart';
 
 class MapConvertor
 {
-  static const String noneSelection='بدون انتخاب';
+  static const String noneSelection='انتخاب نشده';
   static List<Map<String, dynamic>> MapToList(List<BaseDefinitionDTO> items)
   {
     var res =  <Map<String,dynamic>>{};
