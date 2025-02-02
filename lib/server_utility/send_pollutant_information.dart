@@ -15,7 +15,8 @@ class PollutantInformation {
       //var token=loginInfo.token;
       var url = Uri.https(Constants.baseURL, Constants.registerPollutantPath);
       print(pollutantRegisterModel.toJson());
-      var jsonBody = jsonEncode(pollutantRegisterModel.toJson());
+      var x=pollutantRegisterModel.toJson();
+      var jsonBody = jsonEncode(x);
       SharedPreferences prefs = await SharedPreferences.getInstance();
       var strLoginInfo = prefs.getString('loginInfo');
       var loginInfo = jsonDecode(strLoginInfo!);

@@ -33,7 +33,12 @@ class _OfficerSelectionState extends State<OfficerSelection> {
     print("Selected id: ${selectedValue['id']}");
     print("Selected title: ${selectedValue['title']}");
     var prefs = await SharedPreferences.getInstance();
-    prefs.setString('officerName',selectedValue['title'].toString());
+
+    //prefs.setString('officerName',selectedValue['title'].toString());
+    prefs.setString('officer',jsonEncode(BaseDefinitionDTO(
+        id: selectedValue['id'],
+        title: selectedValue['title']) )
+    );
   }
 
   @override

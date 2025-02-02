@@ -668,6 +668,7 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
                   pollutantRegisterModel.driverAddress = driverAddressController.text;
                   pollutantRegisterModel.driverDriveLicence = driverDriveLicenseController.text;
 
+                  pollutantRegisterModel.pollutantsValue = [];
                   if (O2Controller.text.isNotEmpty)
                     pollutantRegisterModel.pollutantsValue.add(PollutantValue(
                         pollutant: CarsPollutants.O2, value: double.parse(O2Controller.text)));
@@ -738,6 +739,11 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
                   // print(relationWithOwnerController.text);
                   // print(pollutantRegisterModel.carTypeId.toString()+"============================car type id");
                   try {
+                    var prefs = await SharedPreferences.getInstance();
+                    var strOfficer = prefs.getString('officer');
+                    var officer = jsonDecode(strOfficer!);
+                    pollutantRegisterModel.officerId = int.parse(officer['id']);
+
                     Loading.open(context);
                     var res = await PollutantInformation().send(pollutantRegisterModel);
                     Loading.close(context);
@@ -756,8 +762,7 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
                             'لطفا موارد زیر را رعایت کنید', jsonRes['errors'].toString());
                       }
                     } else {
-                      ShowModalErrors(
-                          'خطای ارتباطی', res!.statusCode.toString());
+                      ShowModalErrors('خطای ارتباطی', res!.statusCode.toString());
                     }
                   } catch (e) {
                     ShowModalErrors('خطا', e.toString());

@@ -1,9 +1,9 @@
 class Constants {
 
   //سیستم حسین
-  // static const String baseURL="192.168.88.249:44358";
+  static const String baseURL="192.168.88.249:44358";
   //لپتاپ سفیده
-  static const String baseURL="192.168.88.244:44358";
+  // static const String baseURL="192.168.88.244:44358";
   //آدرس اصلی
   // static const String baseURL="payesh.mashhad.ir";
   //آدرس تست
@@ -28,7 +28,7 @@ class Constants {
 
   static const String registerPollutantPath="api/SIMA/Notice/Register";//"api/SIMA/Notice/Register";
 
-  static const int requestTimeOutSecond=20;
+  static const int requestTimeOutSecond=300;
 
 
 }
