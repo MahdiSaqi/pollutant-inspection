@@ -23,7 +23,7 @@ class PollutantRegister extends StatelessWidget
           title: Row(
             mainAxisAlignment: MainAxisAlignment.end, // Align title to the right
             children: [
-              Text('ثبت خودروی آلاینده'),
+              Text('صدور اخطار خودروی آلاینده'),
             ],
           ),
         ),

@@ -29,16 +29,19 @@ class _OfficerSelectionState extends State<OfficerSelection> {
 
   dynamic _onChanged(dynamic selectedValue) async {
     // print("hasTech..."+hasTechnicalDiagnosisController.text);
-    print("Selected Value: ${selectedValue['value']}");
-    print("Selected id: ${selectedValue['id']}");
-    print("Selected title: ${selectedValue['title']}");
+    // print("Selected Value: ${selectedValue['value']}");
+    // print("Selected id: ${selectedValue['id']}");
+    // print("Selected title: ${selectedValue['title']}");
     var prefs = await SharedPreferences.getInstance();
+    prefs.setString('officer',
+        jsonEncode(BaseDefinitionDTO(id: selectedValue['id'], title: selectedValue['title'])));
 
-    //prefs.setString('officerName',selectedValue['title'].toString());
-    prefs.setString('officer',jsonEncode(BaseDefinitionDTO(
-        id: selectedValue['id'],
-        title: selectedValue['title']) )
-    );
+    setState(() {
+      if (selectedValue['id'] != "-1")
+        isButtonDisabled = false;
+      else
+        isButtonDisabled = true;
+    });
   }
 
   @override
@@ -56,12 +59,12 @@ class _OfficerSelectionState extends State<OfficerSelection> {
       try {
         setState(() {
           officers = List<BaseDefinitionDTO>.from(
-              baseDef['officers'].map((item) =>
-                  BaseDefinitionDTO.fromJson(item)));
-          isButtonDisabled = false;
+              baseDef['officers'].map((item) => BaseDefinitionDTO.fromJson(item)));
+          //isButtonDisabled = false;
         });
+      } catch (e) {
+        print(e);
       }
-      catch(e){ print(e);  }
     }
   }
 
@@ -69,32 +72,34 @@ class _OfficerSelectionState extends State<OfficerSelection> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          children: [
-            DropdownList(
-              key: GlobalKey(),
-              title: "افسر شیفت",
-              items: MapConvertor.MapToList(officers),
-              //  MapToList(relationWithOwnerItems), //MapToList(loginInfo.officers),
-              selected: officersController,
-              onChanged: (selectedValue) {
-                _onChanged(selectedValue);
-                //pollutantRegisterModel.officerId=int.parse(selectedValue['id']);
-              },
-            ),
-            ElevatedButton(
-                onPressed: isButtonDisabled
-                    ? null
-                    : () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => LandingPage()));
-                      },
-                child: Row(
-                  children: [Text('ورود'), Icon(Icons.clear)],
-                ))
-          ],
+        child: Directionality(
+          textDirection: TextDirection.rtl,
+          child: Column(
+            children: [
+              DropdownList(
+                key: GlobalKey(),
+                title: "افسر شیفت",
+                items: MapConvertor.MapToList(officers),
+                //  MapToList(relationWithOwnerItems), //MapToList(loginInfo.officers),
+                selected: officersController,
+                onChanged: (selectedValue) {
+                  _onChanged(selectedValue);
+                  //pollutantRegisterModel.officerId=int.parse(selectedValue['id']);
+                },
+              ),
+              ElevatedButton(
+                  onPressed: isButtonDisabled
+                      ? null
+                      : () {
+                          Navigator.push(
+                              context, MaterialPageRoute(builder: (context) => LandingPage()));
+                        },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [Text('ورود'), Icon(Icons.login)],
+                  ))
+            ],
+          ),
         ),
       ),
     );

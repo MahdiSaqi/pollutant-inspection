@@ -44,6 +44,7 @@ dependencies:
   persian_datetime_picker: ^2.7.0
   shared_preferences: ^2.2.3
   image: ^4.5.2
+  geolocator: ^8.2.0
 
 
 dev_dependencies:

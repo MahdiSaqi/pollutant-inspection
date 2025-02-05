@@ -38,6 +38,9 @@ class _LoginedUserState extends State<LoginedUser> {
   Widget build(BuildContext context) {
     return Text("کاربر جاری: " + userName,
       textDirection: TextDirection.rtl,
-      textAlign: TextAlign.right,);
+      textAlign: TextAlign.right,
+      style: TextStyle(
+        fontSize: 20,
+      ),);
   }
 }

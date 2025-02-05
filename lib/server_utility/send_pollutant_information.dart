@@ -45,9 +45,7 @@ class PollutantInformation {
       // ));
       return res;
     } catch (e) {
-      print(e);
-
-      // throw;
+      throw e;
     }
   }
 }

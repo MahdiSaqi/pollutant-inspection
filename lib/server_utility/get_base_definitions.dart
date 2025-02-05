@@ -33,7 +33,7 @@ class GetBaseDefinitions {
 
       //SIMABaseDefinition? simaBaseDefinition;
     } catch (e) {
-      print(e);
+      e.toString();
     }
   }
 }
