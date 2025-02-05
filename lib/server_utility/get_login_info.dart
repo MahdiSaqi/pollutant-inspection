@@ -27,7 +27,7 @@ class GetLoginInfo {
           //TODO print 3 line
                print(res.statusCode);
           var mapRes= jsonDecode(res.body);
-                print(mapRes['data']['token']);
+                //print(mapRes['data']['token']);
           objRes=SIMALoginInfo.fromJson(mapRes['data']);
           // print(res.statusCode);
           //       print(objRes.carTypes[1].title);

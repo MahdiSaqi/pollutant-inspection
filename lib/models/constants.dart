@@ -28,7 +28,7 @@ class Constants {
 
   static const String registerPollutantPath="api/SIMA/Notice/Register";//"api/SIMA/Notice/Register";
 
-  static const int requestTimeOutSecond=300;
+  static const int requestTimeOutSecond=10;
 
 
 }

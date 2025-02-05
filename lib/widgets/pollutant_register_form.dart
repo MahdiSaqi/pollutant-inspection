@@ -1,6 +1,7 @@
 import 'dart:convert';
-import 'dart:ffi';
-import 'dart:io';
+//import 'dart:ffi';
+//import 'dart:html';
+import 'dart:io' as dartIO;
 
 //import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +18,9 @@ import 'package:pollutant_inspection/models/SIMA_login_info.dart';
 import 'package:pollutant_inspection/models/pollutant_register_model.dart';
 import 'package:pollutant_inspection/server_utility/get_login_key.dart';
 import 'package:pollutant_inspection/server_utility/send_pollutant_information.dart';
+import 'package:pollutant_inspection/utility/get_current_location.dart';
 import 'package:pollutant_inspection/utility/loding.dart';
+import 'package:pollutant_inspection/utility/show_modal_error.dart';
 import 'package:pollutant_inspection/widgets/camera.dart';
 import 'package:pollutant_inspection/widgets/dropdown_2.dart';
 import 'package:pollutant_inspection/widgets/dropdown_3.dart';
@@ -47,7 +50,7 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
   // PollutantRegisterFormState(/*{required this.loginInfo}*/);
   static const String noneSelection = 'بدون انتخاب';
   String _selectedDate = Jalali.now().toJalaliDateTime();
-  File? _base64Image;
+  dartIO.File? _base64Image;
   bool hasTech = false; //برای مشاهده یا عدم مشاهده مراکز معاینه فنی
   bool hasAnalyzer = false;
   bool needTechnicalDiagnosis = false;
@@ -85,29 +88,29 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
 
   List<BaseDefinitionDTO> districtItems = [
     BaseDefinitionDTO(id: '0', title: 'منطقه 1'),
-    BaseDefinitionDTO(id: '0', title: 'منطقه 2'),
-    BaseDefinitionDTO(id: '0', title: 'منطقه 3'),
-    BaseDefinitionDTO(id: '0', title: 'منطقه 4'),
-    BaseDefinitionDTO(id: '0', title: 'منطقه 5'),
-    BaseDefinitionDTO(id: '0', title: 'منطقه 6'),
-    BaseDefinitionDTO(id: '0', title: 'منطقه 7'),
-    BaseDefinitionDTO(id: '0', title: 'منطقه 8'),
-    BaseDefinitionDTO(id: '0', title: 'منطقه 9'),
-    BaseDefinitionDTO(id: '0', title: 'منطقه 10'),
-    BaseDefinitionDTO(id: '0', title: 'منطقه 11'),
-    BaseDefinitionDTO(id: '0', title: 'منطقه 12'),
-    BaseDefinitionDTO(id: '0', title: 'منطقه ثامن'),
-    BaseDefinitionDTO(id: '0', title: 'خارج از شهر'),
+    BaseDefinitionDTO(id: '1', title: 'منطقه 2'),
+    BaseDefinitionDTO(id: '2', title: 'منطقه 3'),
+    BaseDefinitionDTO(id: '3', title: 'منطقه 4'),
+    BaseDefinitionDTO(id: '4', title: 'منطقه 5'),
+    BaseDefinitionDTO(id: '5', title: 'منطقه 6'),
+    BaseDefinitionDTO(id: '6', title: 'منطقه 7'),
+    BaseDefinitionDTO(id: '7', title: 'منطقه 8'),
+    BaseDefinitionDTO(id: '8', title: 'منطقه 9'),
+    BaseDefinitionDTO(id: '9', title: 'منطقه 10'),
+    BaseDefinitionDTO(id: '10', title: 'منطقه 11'),
+    BaseDefinitionDTO(id: '11', title: 'منطقه 12'),
+    BaseDefinitionDTO(id: '12', title: 'منطقه ثامن'),
+    BaseDefinitionDTO(id: '13', title: 'خارج از شهر'),
   ];
   List<BaseDefinitionDTO> engineTypeItems = [
     //BaseDefinitionDTO(id: '0', title: 'دوگانه'),
-    BaseDefinitionDTO(id: '1', title: 'بنزین'),
-    BaseDefinitionDTO(id: '2', title: 'گازوئیل'),
+    BaseDefinitionDTO(id: '0', title: 'بنزین'),
+    BaseDefinitionDTO(id: '1', title: 'گازوئیل'),
   ];
   List<BaseDefinitionDTO> fuelingTypeItems = [
     //BaseDefinitionDTO(id: '0', title: 'نامشخص'),
-    BaseDefinitionDTO(id: '1', title: 'انژکتور'),
-    BaseDefinitionDTO(id: '2', title: 'کاربراتور'),
+    BaseDefinitionDTO(id: '0', title: 'انژکتور'),
+    BaseDefinitionDTO(id: '1', title: 'کاربراتور'),
   ];
   List<BaseDefinitionDTO> hasTechnicalDiagnosisItems = [
     BaseDefinitionDTO(id: 'true', title: 'دارد'),
@@ -182,21 +185,29 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
   }
 
   _initialize() async {
+    ///TODO دریافت آنلاین اطلاعات از سرور باید انجام شود
     var prefs = await SharedPreferences.getInstance();
     var strBaseDef = prefs.getString('baseDefinitions');
     if (strBaseDef != null) {
       var baseDef = jsonDecode(strBaseDef);
+
+      ///officer
+      var prefs = await SharedPreferences.getInstance();
+      var strOfficer = prefs.getString('officer');
+      var officer = jsonDecode(strOfficer!);
+      pollutantRegisterModel.officerId = int.parse(officer['id']);
+
       setState(() {
         carTypes = List<BaseDefinitionDTO>.from(
             baseDef['carTypes'].map((item) => BaseDefinitionDTO.fromJson(item)));
         technicalCenters = List<BaseDefinitionDTO>.from(
             baseDef['technicalCenters'].map((item) => BaseDefinitionDTO.fromJson(item)));
-        officerName = prefs.getString('officerName') as String;
+        officerName = officer['title'];
       });
     }
   }
 
-  void handleImageSelected(File? base64Image) {
+  void handleImageSelected(dartIO.File? base64Image) {
     setState(() {
       _base64Image = base64Image;
     });
@@ -220,31 +231,6 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
     print("Selected Value: ${selectedValue['value']}");
     print("Selected id: ${selectedValue['id']}");
     print("Selected title: ${selectedValue['title']}");
-  }
-
-  void ShowModalErrors(String title, String content) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Directionality(
-          textDirection: TextDirection.rtl,
-          child: AlertDialog(
-            backgroundColor: Colors.white.withOpacity(0.5),
-            title: Text(title),
-            content: Text(content),
-            actions: [
-              CloseButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              )
-              // cancelButton,
-              // continueButton,
-            ],
-          ),
-        );
-      },
-    );
   }
 
   void _clearForm() {
@@ -350,6 +336,7 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
 
           MyFormField(
             labelText: 'مدل خودرو',
+            keyboardType: TextInputType.none,
             controller: carModelController,
             onTap: () async {
               carModelController.text = await showDialog(
@@ -661,6 +648,15 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
               ElevatedButton(
                 ///دکمه صدور اخطار
                 onPressed: () async {
+                  var res = await Location().getCurrentLocation();
+                  if (res.ErrorNumber != 0) {
+                    ShowModal(content: res.ErrorMessage, title: 'خطا').Message(context);
+                    return;
+                  } else {
+                    var positionData = jsonDecode(res.Data);
+                    pollutantRegisterModel.lat = positionData['lat'];
+                    pollutantRegisterModel.lng = positionData['lng'];
+                  }
                   pollutantRegisterModel.driverNationalCode = driverNationalCodeController.text;
                   pollutantRegisterModel.driverName = nameController.text;
                   pollutantRegisterModel.driverFamily = familyController.text;
@@ -714,7 +710,10 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
                       threeDigit.text.isEmpty ||
                       iranDigit.text.isEmpty ||
                       letter.text == "-") {
-                    ShowModalErrors('لطفا موارد زیر را رعایت کنید', 'پلاک را به درستی وارد کنید');
+                    ShowModal(
+                            title: 'لطفا موارد زیر را رعایت کنید',
+                            content: 'پلاک را به درستی وارد کنید')
+                        .Message(context);
                     return;
                   }
 
@@ -730,8 +729,10 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
                       carTypesController.text == "0" ||
                       districtController.text == "0" ||
                       engineTypeController.text == "0") {
-                    ShowModalErrors(
-                        'لطفا موارد زیر را رعایت کنید', 'گزینه های بدون انتخاب را انتخاب کنید');
+                    ShowModal(
+                            content: 'لطفا موارد زیر را رعایت کنید',
+                            title: 'گزینه های بدون انتخاب را انتخاب کنید')
+                        .Message(context);
                     return;
                   }
 
@@ -739,10 +740,10 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
                   // print(relationWithOwnerController.text);
                   // print(pollutantRegisterModel.carTypeId.toString()+"============================car type id");
                   try {
-                    var prefs = await SharedPreferences.getInstance();
-                    var strOfficer = prefs.getString('officer');
-                    var officer = jsonDecode(strOfficer!);
-                    pollutantRegisterModel.officerId = int.parse(officer['id']);
+                    // var prefs = await SharedPreferences.getInstance();
+                    // var strOfficer = prefs.getString('officer');
+                    // var officer = jsonDecode(strOfficer!);
+                    // pollutantRegisterModel.officerId = int.parse(officer['id']);
 
                     Loading.open(context);
                     var res = await PollutantInformation().send(pollutantRegisterModel);
@@ -753,19 +754,26 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
                       if (jsonRes['statusCode'] == 0) {
                         //TODO print
                         print(jsonRes['body']);
-                        ShowModalErrors('ثبت شد', 'اخطار با موفقیت صادر شد.');
+                        ShowModal(title: 'ثبت شد', content: 'اخطار با موفقیت صادر شد.')
+                            .Message(context);
                         _clearForm();
                       } else {
                         print(jsonRes);
                         print(jsonRes['errors']);
-                        ShowModalErrors(
-                            'لطفا موارد زیر را رعایت کنید', jsonRes['errors'].toString());
+                        ShowModal(
+                          content: 'لطفا موارد زیر را رعایت کنید',
+                          title: jsonRes['errors'].toString(),
+                        ).Message(context);
                       }
                     } else {
-                      ShowModalErrors('خطای ارتباطی', res!.statusCode.toString());
+                      ShowModal(title: 'خطای ارتباطی', content: res!.statusCode.toString())
+                          .Message(context);
                     }
                   } catch (e) {
-                    ShowModalErrors('خطا', e.toString());
+                    ShowModal(
+                      content: 'خطا',
+                      title: e.toString(),
+                    ).Message(context);
                   }
                 },
 
@@ -789,11 +797,17 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
                   )),
             ],
           ),
+          SizedBox(
+            height: 50,
+          ),
           ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: Text('رفتن به منوی اصلی'))
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [Text('بازگشت به صفحه اصلی'), Icon(Icons.keyboard_return)],
+              ))
         ],
       ),
     );
