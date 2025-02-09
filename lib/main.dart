@@ -25,8 +25,7 @@ class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
     return super.createHttpClient(context)
-      ..badCertificateCallback =
-          (X509Certificate cert, String host, int port) => true;
+      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
   }
 }
 
@@ -80,56 +79,58 @@ class _NavigateToWebLoginState extends State<NavigateToWebLogin> {
       String? strLoginInfo = prefs?.getString('loginInfo');
       if (strLoginInfo != null) {
         var loginInfo = jsonDecode(strLoginInfo);
-        var baseDef = await GetBaseDefinitions().getData(loginInfo['token']);
-        if (baseDef == "400") {
-          // loginKey();
-          ///is code for test on local
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => Container(child: WebLogin("test"))
-                  // PollutantRegister()
-                  ));
-        } else {
-          prefs?.setString('baseDefinitions', baseDef!);
+        var myRes = await GetBaseDefinitions().getData(loginInfo['token']);
+        if (myRes.statusCode == 0) {
           Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => LandingPage()
                   //OfficerSelection()
                   ));
+
+          ///is code for test on local
+          // Navigator.push(
+          //     context,
+          //     MaterialPageRoute(
+          //         builder: (context) => Container(child: WebLogin("test"))
+          //         // PollutantRegister()
+          //         ));
+        } else {
+          loginKey();
         }
       } else {
-        //loginKey();
+        loginKey();
+
         ///is code for test on local
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => Container(child: WebLogin("test"))
-                // PollutantRegister()
-                ));
+        // Navigator.push(
+        //     context,
+        //     MaterialPageRoute(
+        //         builder: (context) => Container(child: WebLogin("test"))
+        //         // PollutantRegister()
+        //         ));
       }
     } catch (e) {
-      // loginKey();
+      loginKey();
 
       ///is code for test on local
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => Container(child: WebLogin("test"))
-              // PollutantRegister()
-              ));
+      // Navigator.push(
+      //     context,
+      //     MaterialPageRoute(
+      //         builder: (context) => Container(child: WebLogin("test"))
+      //         // PollutantRegister()
+      //         ));
     }
   }
 
-  loginKey() {
-    _timer = new Timer(const Duration(milliseconds: 3000), () async {
-      if (await Internet.check() == false) {
-        setState(() {
-          isRetry = true;
-          loginMessage = 'اتصال به اینترنت را بررسی کنید';
-        });
-        return;
-      }
+  loginKey() async {
+    try {
+      // _timer = new Timer(const Duration(milliseconds: 3000), () async {
+      //   if (await Internet.check() == false) {
+      //     setState(() {
+      //       isRetry = true;
+      //       loginMessage = 'اتصال به اینترنت را بررسی کنید';
+      //     });
+      //     return;
+      //   }
       Loading.open(context);
       var res = await Login().getLoginKey();
       Loading.close(context);
@@ -137,10 +138,10 @@ class _NavigateToWebLoginState extends State<NavigateToWebLogin> {
       if (res != null && res.statusCode == 0) {
         Navigator.pop(context);
 
+        var loginKey=jsonDecode(res.data!);
         Navigator.push(
             context,
-            MaterialPageRoute(
-                builder: (context) => Container(child: WebLogin(res.data!))
+            MaterialPageRoute(builder: (context) => Container(child: WebLogin(loginKey))
                 // PollutantRegister()
                 ));
       } else {
@@ -157,7 +158,10 @@ class _NavigateToWebLoginState extends State<NavigateToWebLogin> {
           }
         });
       }
-    });
+      // });
+    } catch (e) {
+      e.toString();
+    }
   }
 
   @override
@@ -171,7 +175,7 @@ class _NavigateToWebLoginState extends State<NavigateToWebLogin> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        if (isRetry == false) CircularProgressIndicator(),
+        if (isRetry == false) LinearProgressIndicator(),
         Text(loginMessage),
         if (isRetry == true)
           ElevatedButton(

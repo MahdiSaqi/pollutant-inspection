@@ -1,9 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:pollutant_inspection/models/my_result.dart';
+import 'package:pollutant_inspection/utility/show_modal_error.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 
 import 'package:pollutant_inspection/models/constants.dart';
 import 'package:pollutant_inspection/pages/pollutant_register.dart';
@@ -13,22 +14,18 @@ import 'package:pollutant_inspection/pages/officer_selection.dart';
 
 import '../server_utility/get_base_definitions.dart';
 
-
 class WebLogin extends StatelessWidget {
   String loginKey;
+
   WebLogin(this.loginKey);
+
   @override
   Widget build(BuildContext context) {
-    print(Constants.loginPageUri
-        +loginKey
-        +"?state="
-        +Constants.state
-    );
+    print(Constants.loginPageUri + loginKey + "?state=" + Constants.state);
     late final PlatformWebViewControllerCreationParams params;
     params = const PlatformWebViewControllerCreationParams();
 
-    final WebViewController controller =
-    WebViewController.fromPlatformCreationParams(params);
+    final WebViewController controller = WebViewController.fromPlatformCreationParams(params);
     // #enddocregion platform_features
 
     controller
@@ -46,32 +43,46 @@ class WebLogin extends StatelessWidget {
             debugPrint('Page finished loading: $url');
             Uri uri = Uri.parse(url);
             String? token = uri.queryParameters['t'];
-            token = '1111';
-            if(token != null)
-            {
-
+            //token = '1111';
+            if (token != null) {
               //Navigator.pop(context);
-              //TODO     مقداار توکن باید از رشته آدرس برگشتی استخراج شود
               Loading.open(context);
-              var loginInfo=await GetLoginInfo().getData(token);
+              var myRes = await GetLoginInfo().getData(token);
               Loading.close(context);
 
-              if(loginInfo!=null)
-              {
-                  SharedPreferences prefs = await SharedPreferences.getInstance();
-                  prefs.setString('loginInfo', jsonEncode(loginInfo));
+              if (myRes.statusCode == 0) {
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                prefs.setString('loginInfo', myRes.data!);
 
-                  var baseDef = await GetBaseDefinitions().getData(loginInfo.token);
-                  prefs.setString('baseDefinitions', baseDef!);
+                var mapLoginInfo = jsonDecode(myRes.data!);
+                var myResBaseDef = await GetBaseDefinitions().getData(mapLoginInfo['token']);
+                if (myResBaseDef.statusCode == 0)
+                  prefs.setString('baseDefinitions', myResBaseDef.data!);
+                else {
+                  ShowModal(
+                          title: myResBaseDef.statusCode.toString(),
+                          content: myResBaseDef.errors.toString())
+                      .Message(context);
+                  controller.loadRequest(
+                      Uri.parse(Constants.loginPageUri + loginKey + "?state=" + Constants.state));
+                }
 
-                  Navigator.pop(context);
+                Navigator.pop(context);
 
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => OfficerSelection() /*PollutantRegister(loginInfo: loginInfo,)*/),
-                  );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          OfficerSelection() /*PollutantRegister(loginInfo: loginInfo,)*/),
+                );
+              } else {
+                ShowModal(title: myRes.statusCode.toString(), content: myRes.errors.toString())
+                    .Message(context);
+                controller.loadRequest(
+                    Uri.parse(Constants.loginPageUri + loginKey + "?state=" + Constants.state));
+
+                ///TODO reload the url ..loadRequest(Uri.parse(Constants.loginPageUri + loginKey + "?state=" + Constants.state));
               }
-
             }
           },
           onWebResourceError: (WebResourceError error) {
@@ -107,12 +118,7 @@ class WebLogin extends StatelessWidget {
           );
         },
       )
-      ..loadRequest(Uri.parse(
-          Constants.loginPageUri
-          +loginKey
-          +"?state="
-          +Constants.state
-      ));
+      ..loadRequest(Uri.parse(Constants.loginPageUri + loginKey + "?state=" + Constants.state));
     return WebViewWidget(controller: controller);
   }
 }

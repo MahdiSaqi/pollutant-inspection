@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 //import 'dart:ffi';
 //import 'dart:html';
 import 'dart:io' as dartIO;
@@ -649,11 +650,11 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
                 ///دکمه صدور اخطار
                 onPressed: () async {
                   var res = await Location().getCurrentLocation();
-                  if (res.ErrorNumber != 0) {
-                    ShowModal(content: res.ErrorMessage, title: 'خطا').Message(context);
+                  if (res.statusCode != 0) {
+                    ShowModal(content: res.errors.toString(), title: 'خطا').Message(context);
                     return;
                   } else {
-                    var positionData = jsonDecode(res.Data);
+                    var positionData = jsonDecode(res.data!);
                     pollutantRegisterModel.lat = positionData['lat'];
                     pollutantRegisterModel.lng = positionData['lng'];
                   }
@@ -745,30 +746,44 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
                     // var officer = jsonDecode(strOfficer!);
                     // pollutantRegisterModel.officerId = int.parse(officer['id']);
 
+                    ShowModal(
+                            title: 'اطلاعات زیر ثبت شود؟',
+                            content: "شماره پلاک: " +
+                                pollutantRegisterModel.carPlate +
+                                "\n" +
+                                "شماره همراه: " +
+                                pollutantRegisterModel.driverMobile)
+                        .Message(context);
                     Loading.open(context);
                     var res = await PollutantInformation().send(pollutantRegisterModel);
                     Loading.close(context);
 
-                    if (res != null && res.statusCode == 200) {
-                      var jsonRes = jsonDecode(res.body);
-                      if (jsonRes['statusCode'] == 0) {
-                        //TODO print
-                        print(jsonRes['body']);
-                        ShowModal(title: 'ثبت شد', content: 'اخطار با موفقیت صادر شد.')
-                            .Message(context);
-                        _clearForm();
-                      } else {
-                        print(jsonRes);
-                        print(jsonRes['errors']);
-                        ShowModal(
-                          content: 'لطفا موارد زیر را رعایت کنید',
-                          title: jsonRes['errors'].toString(),
-                        ).Message(context);
-                      }
-                    } else {
-                      ShowModal(title: 'خطای ارتباطی', content: res!.statusCode.toString())
+                    if (res.statusCode == 0)
+                      ShowModal(title: 'ثبت شد', content: 'اخطار با موفقیت صادر شد')
                           .Message(context);
-                    }
+                    else
+                      ShowModal(title: res.statusCode.toString(), content: res.errors.toString())
+                          .Message(context);
+                    // if (res != null && res.statusCode == 200) {
+                    //   var jsonRes = jsonDecode(res.body);
+                    //   if (jsonRes['statusCode'] == 0) {
+                    //     //TODO print
+                    //     print(jsonRes['body']);
+                    //     ShowModal(title: 'ثبت شد', content: 'اخطار با موفقیت صادر شد.')
+                    //         .Message(context);
+                    //     _clearForm();
+                    //   } else {
+                    //     print(jsonRes);
+                    //     print(jsonRes['errors']);
+                    //     ShowModal(
+                    //       content: 'لطفا موارد زیر را رعایت کنید',
+                    //       title: jsonRes['errors'].toString(),
+                    //     ).Message(context);
+                    //   }
+                    // } else {
+                    //   ShowModal(title: 'خطای ارتباطی', content: res!.statusCode.toString())
+                    //       .Message(context);
+                    // }
                   } catch (e) {
                     ShowModal(
                       content: 'خطا',

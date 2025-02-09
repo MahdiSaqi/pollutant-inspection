@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:pollutant_inspection/pages/landing_page.dart';
 import 'package:pollutant_inspection/pages/pollutant_register.dart';
+import 'package:pollutant_inspection/utility/show_modal_error.dart';
 
 import 'package:pollutant_inspection/widgets/dropdown_3.dart';
 import 'package:pollutant_inspection/utility/map_to_list.dart';
@@ -65,6 +66,8 @@ class _OfficerSelectionState extends State<OfficerSelection> {
       } catch (e) {
         print(e);
       }
+    }else {
+      ShowModal(title: 'خطا', content: 'عدم دریافت لیست افسران').Message(context);
     }
   }
 

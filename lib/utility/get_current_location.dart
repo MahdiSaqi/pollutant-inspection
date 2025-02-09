@@ -4,7 +4,8 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:pollutant_inspection/models/result_model.dart';
+import 'package:pollutant_inspection/models/my_result.dart';
+import 'package:pollutant_inspection/models/result_model_.dart';
 import 'package:pollutant_inspection/utility/show_modal_error.dart';
 
 // class GetCurrentLocation extends StatefulWidget {
@@ -62,13 +63,15 @@ import 'package:pollutant_inspection/utility/show_modal_error.dart';
 //   }
 
 class Location {
-  Future<Result> getCurrentLocation() async {
+  Future<MyResult> getCurrentLocation() async {
     // Request permission
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        return Result(ErrorNumber: 1, ErrorMessage: 'عدم دسترسی به لوکیشن', Data: '');
+        return MyResult(statusCode: 1,
+            errors:  ['عدم دسترسی به لوکیشن'],
+            data: null);
       }
     }
 
@@ -80,6 +83,9 @@ class Location {
       "lng": position.longitude,
     };
 
-    return Result(ErrorNumber: 0, ErrorMessage: '', Data: jsonEncode(locationData));
+    return MyResult(
+        data: jsonEncode(locationData),
+        errors: null,
+        statusCode: 0);
   }
 }

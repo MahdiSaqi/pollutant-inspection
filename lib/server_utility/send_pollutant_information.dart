@@ -3,19 +3,20 @@ import 'dart:io';
 
 import 'package:pollutant_inspection/models/SIMA_login_info.dart';
 import 'package:pollutant_inspection/models/constants.dart';
+import 'package:pollutant_inspection/models/my_result.dart';
 import 'package:pollutant_inspection/models/pollutant_register_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PollutantInformation {
-  Future<http.Response?> send(
+  Future<MyResult> send(
       /*SIMALoginInfo loginInfo,*/
       PollutantRegisterModel pollutantRegisterModel) async {
     try {
       //var token=loginInfo.token;
       var url = Uri.https(Constants.baseURL, Constants.registerPollutantPath);
       print(pollutantRegisterModel.toJson());
-      var x=pollutantRegisterModel.toJson();
+      var x = pollutantRegisterModel.toJson();
       var jsonBody = jsonEncode(x);
       SharedPreferences prefs = await SharedPreferences.getInstance();
       var strLoginInfo = prefs.getString('loginInfo');
@@ -43,9 +44,9 @@ class PollutantInformation {
       //   RegExp(r'\\u(\w{4})'),
       //       (Match match) => String.fromCharCode(int.parse(match.group(1)!, radix: 16)),
       // ));
-      return res;
+        return MyResult.convert(res);
     } catch (e) {
-      throw e;
+      return MyResult.catchReturn(e.toString());
     }
   }
 }
