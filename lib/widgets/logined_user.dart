@@ -40,7 +40,7 @@ class _LoginedUserState extends State<LoginedUser> {
       textDirection: TextDirection.rtl,
       textAlign: TextAlign.right,
       style: TextStyle(
-        fontSize: 20,
+        fontSize: 16,
       ),);
   }
 }

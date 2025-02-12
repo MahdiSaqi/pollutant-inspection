@@ -340,7 +340,7 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
             keyboardType: TextInputType.none,
             controller: carModelController,
             onTap: () async {
-              carModelController.text = await showDialog(
+              await showDialog(
                   context: context,
                   builder: (BuildContext context) {
                     return Dialog(
@@ -446,51 +446,51 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
               },
             ),
 
-          if (pollutantRegisterModel.engineType == 1 && hasAnalyzer)
+          if (pollutantRegisterModel.engineType == 0 && hasAnalyzer)
             MyFormField(
-              labelText: 'O2',
+              labelText: 'اکسیژن(O2)',
               controller: O2Controller,
               keyboardType: TextInputType.number,
             ),
-          if (pollutantRegisterModel.engineType == 1 && hasAnalyzer)
+          if (pollutantRegisterModel.engineType == 0 && hasAnalyzer)
             MyFormField(
-              labelText: 'lambda',
+              labelText: 'لاندا(lambda)',
               controller: LambdaController,
               keyboardType: TextInputType.number,
             ),
-          if (pollutantRegisterModel.engineType == 1 && hasAnalyzer)
+          if (pollutantRegisterModel.engineType == 0 && hasAnalyzer)
             MyFormField(
-              labelText: 'CO',
+              labelText: 'مونوکسیدکربن(CO)',
               controller: COController,
               keyboardType: TextInputType.number,
             ),
-          if (pollutantRegisterModel.engineType == 1 && hasAnalyzer)
+          if (pollutantRegisterModel.engineType == 0 && hasAnalyzer)
             MyFormField(
-              labelText: 'HC',
+              labelText: 'هیدروکربن های نسوخته(HC)',
               controller: HCController,
               keyboardType: TextInputType.number,
             ),
-          if (pollutantRegisterModel.engineType == 1 && hasAnalyzer)
+          if (pollutantRegisterModel.engineType == 0 && hasAnalyzer)
             MyFormField(
-              labelText: 'NO',
+              labelText: 'مونوکسید نیتروژن(NO)',
               controller: NOController,
               keyboardType: TextInputType.number,
             ),
-          if (pollutantRegisterModel.engineType == 1 && hasAnalyzer)
+          if (pollutantRegisterModel.engineType == 0 && hasAnalyzer)
             MyFormField(
-              labelText: 'CO2',
+              labelText: 'دی اکسیدکربن(CO2)',
               controller: CO2Controller,
               keyboardType: TextInputType.number,
             ),
-          if (pollutantRegisterModel.engineType == 2 && hasAnalyzer)
+          if (pollutantRegisterModel.engineType == 1 && hasAnalyzer)
             MyFormField(
-              labelText: 'Opacity',
+              labelText: 'کدورت(Opacity)',
               controller: OpacityController,
               keyboardType: TextInputType.number,
             ),
-          if (pollutantRegisterModel.engineType == 2 && hasAnalyzer)
+          if (pollutantRegisterModel.engineType == 1 && hasAnalyzer)
             MyFormField(
-              labelText: 'K',
+              labelText: 'ضریب جذب(K)',
               controller: KController,
               keyboardType: TextInputType.number,
             ),
@@ -740,56 +740,61 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
                   // print(pollutantRegisterModel.relationWithOwner.index.toString()+"=====================relationWithOwner.index");
                   // print(relationWithOwnerController.text);
                   // print(pollutantRegisterModel.carTypeId.toString()+"============================car type id");
-                  try {
-                    // var prefs = await SharedPreferences.getInstance();
-                    // var strOfficer = prefs.getString('officer');
-                    // var officer = jsonDecode(strOfficer!);
-                    // pollutantRegisterModel.officerId = int.parse(officer['id']);
 
-                    ShowModal(
-                            title: 'اطلاعات زیر ثبت شود؟',
-                            content: "شماره پلاک: " +
-                                pollutantRegisterModel.carPlate +
-                                "\n" +
-                                "شماره همراه: " +
-                                pollutantRegisterModel.driverMobile)
-                        .Message(context);
-                    Loading.open(context);
-                    var res = await PollutantInformation().send(pollutantRegisterModel);
-                    Loading.close(context);
+                  // var prefs = await SharedPreferences.getInstance();
+                  // var strOfficer = prefs.getString('officer');
+                  // var officer = jsonDecode(strOfficer!);
+                  // pollutantRegisterModel.officerId = int.parse(officer['id']);
 
-                    if (res.statusCode == 0)
-                      ShowModal(title: 'ثبت شد', content: 'اخطار با موفقیت صادر شد')
-                          .Message(context);
-                    else
-                      ShowModal(title: res.statusCode.toString(), content: res.errors.toString())
-                          .Message(context);
-                    // if (res != null && res.statusCode == 200) {
-                    //   var jsonRes = jsonDecode(res.body);
-                    //   if (jsonRes['statusCode'] == 0) {
-                    //     //TODO print
-                    //     print(jsonRes['body']);
-                    //     ShowModal(title: 'ثبت شد', content: 'اخطار با موفقیت صادر شد.')
-                    //         .Message(context);
-                    //     _clearForm();
-                    //   } else {
-                    //     print(jsonRes);
-                    //     print(jsonRes['errors']);
-                    //     ShowModal(
-                    //       content: 'لطفا موارد زیر را رعایت کنید',
-                    //       title: jsonRes['errors'].toString(),
-                    //     ).Message(context);
-                    //   }
-                    // } else {
-                    //   ShowModal(title: 'خطای ارتباطی', content: res!.statusCode.toString())
-                    //       .Message(context);
-                    // }
-                  } catch (e) {
-                    ShowModal(
-                      content: 'خطا',
-                      title: e.toString(),
-                    ).Message(context);
-                  }
+                  ShowModal(
+                      title: 'اطلاعات زیر ثبت شود؟',
+                      content: "شماره پلاک: " +
+                          pollutantRegisterModel.carPlate +
+                          "\n" +
+                          "شماره همراه: " +
+                          pollutantRegisterModel.driverMobile,
+                      onOkPressed: () async {
+                        try {
+                          Navigator.pop(context);
+                          Loading.open(context);
+                          var res = await PollutantInformation().send(pollutantRegisterModel);
+                          Loading.close(context);
+
+                          if (res.statusCode == 0)
+                            ShowModal(title: 'ثبت شد', content: 'اخطار با موفقیت صادر شد')
+                                .Message(context);
+                          else
+                            ShowModal(
+                                    title: res.statusCode.toString(),
+                                    content: res.errors.toString())
+                                .Message(context);
+                          // if (res != null && res.statusCode == 200) {
+                          //   var jsonRes = jsonDecode(res.body);
+                          //   if (jsonRes['statusCode'] == 0) {
+                          //     //TODO print
+                          //     print(jsonRes['body']);
+                          //     ShowModal(title: 'ثبت شد', content: 'اخطار با موفقیت صادر شد.')
+                          //         .Message(context);
+                          //     _clearForm();
+                          //   } else {
+                          //     print(jsonRes);
+                          //     print(jsonRes['errors']);
+                          //     ShowModal(
+                          //       content: 'لطفا موارد زیر را رعایت کنید',
+                          //       title: jsonRes['errors'].toString(),
+                          //     ).Message(context);
+                          //   }
+                          // } else {
+                          //   ShowModal(title: 'خطای ارتباطی', content: res!.statusCode.toString())
+                          //       .Message(context);
+                          // }
+                        } catch (e) {
+                          ShowModal(
+                            content: 'خطا',
+                            title: e.toString(),
+                          ).Message(context);
+                        }
+                      }).Message(context);
                 },
 
                 ///on pressed

@@ -43,7 +43,9 @@ class WebLogin extends StatelessWidget {
             debugPrint('Page finished loading: $url');
             Uri uri = Uri.parse(url);
             String? token = uri.queryParameters['t'];
-            //token = '1111';
+            //////??????for dev...
+            if (Constants().isDevelop) token = '1111';
+
             if (token != null) {
               //Navigator.pop(context);
               Loading.open(context);
@@ -56,9 +58,18 @@ class WebLogin extends StatelessWidget {
 
                 var mapLoginInfo = jsonDecode(myRes.data!);
                 var myResBaseDef = await GetBaseDefinitions().getData(mapLoginInfo['token']);
-                if (myResBaseDef.statusCode == 0)
+                if (myResBaseDef.statusCode == 0) {
                   prefs.setString('baseDefinitions', myResBaseDef.data!);
-                else {
+
+                  Navigator.pop(context);///?????
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            OfficerSelection() /*PollutantRegister(loginInfo: loginInfo,)*/),
+                  );
+                } else {
                   ShowModal(
                           title: myResBaseDef.statusCode.toString(),
                           content: myResBaseDef.errors.toString())
@@ -66,22 +77,11 @@ class WebLogin extends StatelessWidget {
                   controller.loadRequest(
                       Uri.parse(Constants.loginPageUri + loginKey + "?state=" + Constants.state));
                 }
-
-                Navigator.pop(context);
-
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          OfficerSelection() /*PollutantRegister(loginInfo: loginInfo,)*/),
-                );
               } else {
                 ShowModal(title: myRes.statusCode.toString(), content: myRes.errors.toString())
                     .Message(context);
                 controller.loadRequest(
                     Uri.parse(Constants.loginPageUri + loginKey + "?state=" + Constants.state));
-
-                ///TODO reload the url ..loadRequest(Uri.parse(Constants.loginPageUri + loginKey + "?state=" + Constants.state));
               }
             }
           },

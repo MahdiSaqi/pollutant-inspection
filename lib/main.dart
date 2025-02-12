@@ -36,13 +36,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'pollutant......',
+      title: 'Constants.appTitle',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         fontFamily: 'B Yekan',
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'ثبت آلاینده های محیطی'),
+      home: const MyHomePage(title: Constants.appTitle),
     );
   }
 }
@@ -62,7 +62,7 @@ class NavigateToWebLogin extends StatefulWidget {
 }
 
 class _NavigateToWebLoginState extends State<NavigateToWebLogin> {
-  String loginMessage = "...در حال ورود به صفحه لاگین";
+  String loginMessage = "...در حال اتصال به سامانه پایش";
   Timer? _timer;
   bool isRetry = false;
   SharedPreferences? prefs;
@@ -80,6 +80,7 @@ class _NavigateToWebLoginState extends State<NavigateToWebLogin> {
       if (strLoginInfo != null) {
         var loginInfo = jsonDecode(strLoginInfo);
         var myRes = await GetBaseDefinitions().getData(loginInfo['token']);
+
         if (myRes.statusCode == 0) {
           Navigator.push(
               context,
@@ -131,6 +132,13 @@ class _NavigateToWebLoginState extends State<NavigateToWebLogin> {
       //     });
       //     return;
       //   }
+      if (Constants().isDevelop)
+        Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Container(child: WebLogin('loginKey'))
+                // PollutantRegister()
+                ));
+
       Loading.open(context);
       var res = await Login().getLoginKey();
       Loading.close(context);
@@ -138,7 +146,7 @@ class _NavigateToWebLoginState extends State<NavigateToWebLogin> {
       if (res != null && res.statusCode == 0) {
         Navigator.pop(context);
 
-        var loginKey=jsonDecode(res.data!);
+        var loginKey = jsonDecode(res.data!);
         Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => Container(child: WebLogin(loginKey))
