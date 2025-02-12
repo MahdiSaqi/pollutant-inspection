@@ -26,6 +26,8 @@ class Constants {
   static const String getLoginData = "api/sima/login"; //"api/sima/login";
   static const String getBaseDefinition = "api/sima/Definitions";
   static const String getDailyReport = "api/sima/Notice/list";
+  static const String getPlateSearch = "api/sima/Notice";
+
 
   static const String registerPollutantPath =
       "api/SIMA/Notice/Register"; //"api/SIMA/Notice/Register";

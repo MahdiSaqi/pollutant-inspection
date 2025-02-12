@@ -1,45 +1,53 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:pollutant_inspection/server_utility/get_daily_report.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../utility/show_modal_error.dart';
 
-class DailyReport extends StatelessWidget {
-  // Sample data in a list of maps
-  DailyReport() {
+class DailyReport extends StatefulWidget {
+  const DailyReport({Key? key}) : super(key: key);
+
+  @override
+  _DailyReportState createState() => _DailyReportState();
+}
+
+class _DailyReportState extends State<DailyReport> {
+  List<Map<String, dynamic>> data = [];
+  bool isLoading = true; // To manage loading state
+
+  @override
+  void initState() {
+    super.initState();
     _initialize();
   }
 
-  List<Map<String, dynamic>> data = [];
-
-  _initialize() async {
+  Future<void> _initialize() async {
     var prefs = await SharedPreferences.getInstance();
-    String? strLoginInfo = prefs?.getString('loginInfo');
+    String? strLoginInfo = prefs.getString('loginInfo');
+
     if (strLoginInfo != null) {
       var loginInfo = jsonDecode(strLoginInfo);
       var myRes = await GetDailyReport().getData(loginInfo['token']);
-    if (myRes.statusCode == 0) {
-      var resDara = jsonDecode(myRes.data!);
-       var data1=resDara['items'];
-      print('object');
+      if (myRes.statusCode == 0) {
+        var resData = jsonDecode(myRes.data!);
+        setState(() {
+          data = List<Map<String, dynamic>>.from(
+              resData['items']); // Ensure the data is in the correct format
+          isLoading = false; // Update loading state
+        });
+      } else {
+        // Handle error
+        ShowModal(
+          content: myRes.errors.toString(),
+          title: myRes.statusCode.toString(),
+        ).Message(context);
+      }
+    } else {
+      // Handle case where login info is not present
+      setState(() {
+        isLoading = false; // Update loading state
+      });
     }
-    // else {
-    //   ShowModal(
-    //     content: myRes.errors.toString(),
-    //     title: myRes.statusCode.toString(),
-    //   ).Message(context as BuildContext);
-    // }
-    }
-
-    data = [
-      {'id': 1, 'name': 'تست', 'age': 'تست'},
-      {'id': 2, 'name': 'تست', 'age': 'تست'},
-      {'id': 3, 'name': 'تست', 'age': 'تست'},
-      {'id': 4, 'name': 'تست', 'age': 'تست'},
-      {'id': 5, 'name': 'تست', 'age': 'تست'},
-    ];
   }
 
   @override
@@ -50,25 +58,30 @@ class DailyReport extends StatelessWidget {
         appBar: AppBar(
           title: Text('گزارش عملیات'),
         ),
-        body: SingleChildScrollView(
-          child: Container(
-            alignment: Alignment.centerRight,
-            child: DataTable(
-              columns: [
-                DataColumn(label: Text('ردیف')),
-                DataColumn(label: Text('نام مالک')),
-                DataColumn(label: Text('نوع خودرو')),
-              ],
-              rows: data.map((item) {
-                return DataRow(cells: [
-                  DataCell(Text(item['id'].toString())), // Convert ID to String
-                  DataCell(Text(item['name'])),
-                  DataCell(Text(item['age'].toString())), // Convert Age to String
-                ]);
-              }).toList(), // Convert Iterable to List
-            ),
-          ),
-        ),
+        body: isLoading // Show loading indicator while fetching data
+            ? Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+                child: Container(
+                  alignment: Alignment.centerRight,
+                  child: DataTable(
+                    columns: [
+                      DataColumn(label: Text('ردیف')), // Row number column
+                      DataColumn(label: Text('نام مالک')),
+                      DataColumn(label: Text('نوع خودرو')),
+                    ],
+                    rows: data.asMap().entries.map((entry) {
+                      int index = entry.key; // Get the index
+                      var item = entry.value; // Get the item
+
+                      return DataRow(cells: [
+                        DataCell(Text((index + 1).toString())), // Use index + 1 for row number
+                        DataCell(Text(item['ownerName'] ?? '')), // Handle null values
+                        DataCell(Text(item['carPlate'].toString())), // Convert Age to String
+                      ]);
+                    }).toList(), // Convert Iterable to List
+                  ),
+                ),
+              ),
       ),
     );
   }

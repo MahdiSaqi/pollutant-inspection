@@ -205,7 +205,7 @@ class _LandingPageState extends State<LandingPage> {
                         var prefs = await SharedPreferences.getInstance();
                         await prefs.clear();
                         Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(builder: (context) => MyHomePage(title: 'title')),
+                          MaterialPageRoute(builder: (context) => MyHomePage(title: Constants.appTitle)),
                           // Replace with your actual login screen widget
                               (route) => false, // Remove all previous routes
                         );

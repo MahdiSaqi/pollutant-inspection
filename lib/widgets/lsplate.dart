@@ -13,11 +13,11 @@ class LSPlate extends StatefulWidget {
 //
   LSPlate(
       {required this.twoDigit,
-        required this.letter,
-        required this.threeDigit,
-        required this.iranDigit,
-        required this.color,
-        this.enable = true});
+      required this.letter,
+      required this.threeDigit,
+      required this.iranDigit,
+      required this.color,
+      this.enable = true});
 
   @override
   _LSPlateState createState() => _LSPlateState();
@@ -27,10 +27,9 @@ class _LSPlateState extends State<LSPlate> {
   // int number1;
   // int number2;
   // int number3;
-  String alpha='';
+  String alpha = '';
   FocusNode? focusNode;
   final GlobalKey _dropdownKey = GlobalKey();
-
 
   @override
   void initState() {
@@ -51,12 +50,11 @@ class _LSPlateState extends State<LSPlate> {
           // margin: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
           decoration: BoxDecoration(
               image: DecorationImage(
-                image: (widget.color == Colors.white &&
-                    widget.letter != null &&
-                    widget.letter.text != 'ع')
+            image:
+                (widget.color == Colors.white && widget.letter != null && widget.letter.text != 'ع')
                     ? AssetImage("lib/assets/images/plate_modat.png")
                     : AssetImage("lib/assets/images/plate.png"),
-              )),
+          )),
           child: Directionality(
             textDirection: TextDirection.ltr,
             child: Stack(
@@ -134,87 +132,79 @@ class _LSPlateState extends State<LSPlate> {
                         Center(
                           child: widget.color != Colors.white
                               ? Container(
-                              margin: EdgeInsets.only(right: 14),
-                              width: 45,
-                              child: plateText(
-                                  controller: widget.letter,
-                                  maxLength: 1,
-                                  node: node))
-                              : Container(
-                              width: 60,
-                              margin: EdgeInsets.only(right: 7),
-                              // decoration: BoxDecoration(
-                              //   borderRadius: BorderRadius.circular(8),
-                              //   color: widget.letter.text == 'ع'
-                              //       ? Colors.yellow[700].withOpacity(0.4)
-                              //       : Colors.white,
-                              //   boxShadow: [
-                              //     BoxShadow(
-                              //         color: Colors.black.withOpacity(0.05),  spreadRadius: 1),
-                              //   ],
-                              // ),
-                              color: (widget.letter != null &&
-                                  widget.letter.text == 'ع')
-                                  ? Colors.yellow[700]?.withOpacity(0.4)
-                                  : Colors.white,
-                              //.withOpacity(0.9),
-                              //     padding: EdgeInsets.symmetric(horizontal: 3.5),
-                              child: DropdownButton<String>(key: _dropdownKey,
-                                value: alpha,
-                                elevation: 16,
-                                style: TextStyle(
-                                    fontFamily: "B Yekan",
-                                    fontSize: 23,
-                                    color: Colors.black87),
-                                onChanged: (String? newValue) {
-                                  setState(() {
-                                    widget.letter.text = newValue!;
-                                    alpha = newValue;
-                                    // return node.nextFocus();
-                                    FocusScope.of(context).nextFocus();
-                                  });
-                                },
-                                underline: Container(
+                                  margin: EdgeInsets.only(right: 14),
                                   width: 45,
-                                ),
-                                items: <String>[
-                                  '-',
-                                  'ب',
-                                  'ج',
-                                  'د',
-                                  'س',
-                                  'ص',
-                                  'ط',
-                                  'ق',
-                                  'ل',
-                                  'م',
-                                  'ن',
-                                  'و',
-                                  'ه',
-                                  'ی',
-                                  'ژ',
-                                  'الف',
-                                  'ع',
-                                  'ش',
-                                  'پ',
-                                ].map<DropdownMenuItem<String>>(
-                                        (String value) {
+                                  child: plateText(
+                                      controller: widget.letter, maxLength: 1, node: node))
+                              : Container(
+                                  width: 60,
+                                  margin: EdgeInsets.only(right: 7),
+                                  // decoration: BoxDecoration(
+                                  //   borderRadius: BorderRadius.circular(8),
+                                  //   color: widget.letter.text == 'ع'
+                                  //       ? Colors.yellow[700].withOpacity(0.4)
+                                  //       : Colors.white,
+                                  //   boxShadow: [
+                                  //     BoxShadow(
+                                  //         color: Colors.black.withOpacity(0.05),  spreadRadius: 1),
+                                  //   ],
+                                  // ),
+                                  color: (widget.letter != null && widget.letter.text == 'ع')
+                                      ? Colors.yellow[700]?.withOpacity(0.4)
+                                      : Colors.white,
+                                  //.withOpacity(0.9),
+                                  //     padding: EdgeInsets.symmetric(horizontal: 3.5),
+                                  child: DropdownButton<String>(
+                                    key: _dropdownKey,
+                                    value: alpha,
+                                    elevation: 16,
+                                    style: TextStyle(
+                                        fontFamily: "B Yekan", fontSize: 23, color: Colors.black87),
+                                    onChanged: (String? newValue) {
+                                      setState(() {
+                                        widget.letter.text = newValue!;
+                                        alpha = newValue;
+                                        // return node.nextFocus();
+                                        FocusScope.of(context).nextFocus();
+                                      });
+                                    },
+                                    underline: Container(
+                                      width: 45,
+                                    ),
+                                    items: <String>[
+                                      '-',
+                                      'ب',
+                                      'ج',
+                                      'د',
+                                      'س',
+                                      'ص',
+                                      'ط',
+                                      'ق',
+                                      'ل',
+                                      'م',
+                                      'ن',
+                                      'و',
+                                      'ه',
+                                      'ی',
+                                      'ژ',
+                                      'الف',
+                                      'ع',
+                                      'ش',
+                                      'پ',
+                                    ].map<DropdownMenuItem<String>>((String value) {
                                       return DropdownMenuItem<String>(
                                         value: value,
                                         child: Text(value),
                                       );
                                     }).toList(),
-                              )
-                          ),
+                                  )),
                         ),
                         Center(
                           child: Container(
                               margin: EdgeInsets.only(right: 14),
                               width: 60,
                               child: plateText(
-                                  controller: widget.threeDigit,
-                                  maxLength: 3,
-                                  node: node)),
+                                  controller: widget.threeDigit, maxLength: 3, node: node)),
                         ),
                       ],
                     ),
@@ -228,10 +218,7 @@ class _LSPlateState extends State<LSPlate> {
                   child: Container(
                     width: 45,
                     child: plateText(
-                        controller: widget.iranDigit,
-                        maxLength: 2,
-                        node: node,
-                        autoFocus: false),
+                        controller: widget.iranDigit, maxLength: 2, node: node, autoFocus: false),
                   ),
                 )
               ],
@@ -244,11 +231,11 @@ class _LSPlateState extends State<LSPlate> {
 
   TextFormField plateText(
       {required TextEditingController controller,
-        required int maxLength,
-        double fontSize = 27,
-        EdgeInsets padding = const EdgeInsets.symmetric(vertical: 0),
-        required FocusNode node,
-        bool autoFocus = false}) {
+      required int maxLength,
+      double fontSize = 27,
+      EdgeInsets padding = const EdgeInsets.symmetric(vertical: 0),
+      required FocusNode node,
+      bool autoFocus = false}) {
     return TextFormField(
       controller: controller,
       cursorColor: Colors.black,
@@ -256,8 +243,7 @@ class _LSPlateState extends State<LSPlate> {
       textAlign: TextAlign.center,
       textAlignVertical: TextAlignVertical.top,
       maxLength: maxLength,
-      readOnly: (controller.text != null && controller.text == 'ع' ||
-          widget.enable == false)
+      readOnly: (controller.text != null && controller.text == 'ع' || widget.enable == false)
           ? true
           : false,
       //  enabled:
@@ -271,17 +257,16 @@ class _LSPlateState extends State<LSPlate> {
         // print('inaja 3');
         // print(value.toString());
         if (value.length == maxLength) {
-        //   print('33333');
+          //   print('33333');
           FocusScope.of(context).nextFocus();
-        //   if (value.length == 2 &&  widget.letter != null /*&&
-        //       widget.letter.text == 'ع'*/)
-        //     // FocusScope.of(context).nextFocus();
-        //     // focusNode!.requestFocus();
+          //   if (value.length == 2 &&  widget.letter != null /*&&
+          //       widget.letter.text == 'ع'*/)
+          //     // FocusScope.of(context).nextFocus();
+          //     // focusNode!.requestFocus();
 
           GestureDetector? detector =
-          _dropdownKey.currentContext?.findAncestorWidgetOfExactType<GestureDetector>();
+              _dropdownKey.currentContext?.findAncestorWidgetOfExactType<GestureDetector>();
         }
-
       },
 
       //    onEditingComplete: () => FocusScope.of(context).nextFocus(),
@@ -290,31 +275,27 @@ class _LSPlateState extends State<LSPlate> {
       // },
       decoration: new InputDecoration(
           border: OutlineInputBorder(
-            borderSide:
-            BorderSide(color: Colors.black.withOpacity(0.09), width: 1.0),
+            borderSide: BorderSide(color: Colors.black.withOpacity(0.09), width: 1.0),
             borderRadius: const BorderRadius.all(
               const Radius.circular(8.0),
             ),
           ),
-          fillColor: (widget.color == Colors.white &&
-              widget.letter != null &&
-              widget.letter.text != 'ع')
-              ? widget.color
-              : Colors.yellow[700]?.withOpacity(0.4),
+          fillColor:
+              (widget.color == Colors.white && widget.letter != null && widget.letter.text != 'ع')
+                  ? widget.color
+                  : Colors.yellow[700]?.withOpacity(0.4),
           //  fillColor: Colors.yellow[700].withOpacity(0.4),
           //.withOpacity(0.9),
           filled: true,
           counterText: '',
           enabledBorder: OutlineInputBorder(
-            borderSide:
-            BorderSide(color: Colors.black.withOpacity(0.05), width: 1.0),
+            borderSide: BorderSide(color: Colors.black.withOpacity(0.05), width: 1.0),
             borderRadius: const BorderRadius.all(
               const Radius.circular(8.0),
             ),
           ),
           focusedBorder: OutlineInputBorder(
-            borderSide:
-            BorderSide(color: Colors.black.withOpacity(0.2), width: 1.0),
+            borderSide: BorderSide(color: Colors.black.withOpacity(0.2), width: 1.0),
             borderRadius: const BorderRadius.all(
               const Radius.circular(8.0),
             ),

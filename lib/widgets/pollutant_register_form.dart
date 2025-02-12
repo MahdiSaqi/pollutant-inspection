@@ -33,6 +33,7 @@ import 'package:pollutant_inspection/utility/map_to_list.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/base_definitionDTO.dart';
+import '../server_utility/get_plate_search.dart';
 
 class PollutantRegisterForm extends StatefulWidget {
   // SIMALoginInfo loginInfo;
@@ -234,6 +235,56 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
     print("Selected title: ${selectedValue['title']}");
   }
 
+  bool isCorrectPlate() {
+    if (twoDigit.text.isEmpty ||
+        threeDigit.text.isEmpty ||
+        iranDigit.text.isEmpty ||
+        letter.text == "-" ||
+        twoDigit.text.length != 2 || // Check for 2 characters
+        threeDigit.text.length != 3 || // Check for 3 characters
+        iranDigit.text.length != 2 || // Check for 4 characters (Iranian format)
+        letter.text.length != 1) {
+      return false;
+    } else
+      return true;
+  }
+
+  void _fillForm(Map<String, dynamic> res) {
+    print(res['notice']['id']);
+    if (!res['registerIsValid']) {
+      ShowModal(title: 'خطا', content: 'این پلاک اخیرا ثبت شده است و امکان ثبت وجود ندارد')
+          .Message(context);
+      return;
+    }
+    pollutantRegisterModel = PollutantRegisterModel.fromJson(res['notice']);
+
+    setState(() {
+      engineTypeController.text = "0";
+      pollutantRegisterModel.engineType.toString();
+      // fuelingTypeController.text = "0";
+      carTypesController.text = "1"; //pollutantRegisterModel.carTypeId.toString();
+      carModelController.text = pollutantRegisterModel.carModel.toString();
+      nameController.text = pollutantRegisterModel.driverName;
+      familyController.text = pollutantRegisterModel.driverFamily;
+      driverNationalCodeController.text = pollutantRegisterModel.driverNationalCode;
+      // relationWithOwnerController.text = "0";
+      driverMobileController.text = pollutantRegisterModel.driverMobile;
+      // analyzeMethodController.text = "0";
+
+      // recordedDocumentController.text = "0";
+      // hasTech = false;
+
+      // hasTechnicalDiagnosisController.text = "0";
+
+      // technicalCentersController.text = "0";
+
+      // districtController.text = "0";
+      // driverAddressController.clear();
+
+      // hasAnalyzer = false;
+    });
+  }
+
   void _clearForm() {
     driverNationalCodeController.clear();
     nameController.clear();
@@ -296,6 +347,34 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
               threeDigit: threeDigit,
               iranDigit: iranDigit,
               color: Colors.white),
+          ElevatedButton(
+              onPressed: () async {
+                if (!isCorrectPlate()) {
+                  ShowModal(
+                          title: 'لطفا موارد زیر را رعایت کنید',
+                          content: 'پلاک را به درستی وارد کنید')
+                      .Message(context);
+                  return;
+                }
+                var prefs = await SharedPreferences.getInstance();
+                String? strLoginInfo = prefs?.getString('loginInfo');
+                if (strLoginInfo != null) {
+                  var loginInfo = jsonDecode(strLoginInfo);
+                  var myRes = await GetPlateSearch().getData(loginInfo['token'],
+                      twoDigit.text + letter.text + threeDigit.text + iranDigit.text);
+                  if (myRes.statusCode == 0) {
+                    setState(() {
+                      _fillForm(jsonDecode(myRes.data!));
+                    });
+                  } else {
+                    ShowModal(
+                      content: myRes.errors.toString(),
+                      title: myRes.statusCode.toString(),
+                    ).Message(context);
+                  }
+                }
+              },
+              child: Icon(Icons.search)),
           DropdownList(
             key: GlobalKey(),
             title: "نوع موتور خودرو",
@@ -710,7 +789,11 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
                   if (twoDigit.text.isEmpty ||
                       threeDigit.text.isEmpty ||
                       iranDigit.text.isEmpty ||
-                      letter.text == "-") {
+                      letter.text == "-" ||
+                      twoDigit.text.length != 2 || // Check for 2 characters
+                      threeDigit.text.length != 3 || // Check for 3 characters
+                      iranDigit.text.length != 2 || // Check for 4 characters (Iranian format)
+                      letter.text.length != 1) {
                     ShowModal(
                             title: 'لطفا موارد زیر را رعایت کنید',
                             content: 'پلاک را به درستی وارد کنید')
@@ -760,10 +843,11 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
                           var res = await PollutantInformation().send(pollutantRegisterModel);
                           Loading.close(context);
 
-                          if (res.statusCode == 0)
+                          if (res.statusCode == 0) {
                             ShowModal(title: 'ثبت شد', content: 'اخطار با موفقیت صادر شد')
                                 .Message(context);
-                          else
+                            _clearForm();
+                          } else
                             ShowModal(
                                     title: res.statusCode.toString(),
                                     content: res.errors.toString())

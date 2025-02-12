@@ -144,7 +144,7 @@ class _NavigateToWebLoginState extends State<NavigateToWebLogin> {
       Loading.close(context);
 
       if (res != null && res.statusCode == 0) {
-        Navigator.pop(context);
+
 
         var loginKey = jsonDecode(res.data!);
         Navigator.push(
