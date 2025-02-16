@@ -832,7 +832,11 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
                   ShowModal(
                       title: 'اطلاعات زیر ثبت شود؟',
                       content: "شماره پلاک: " +
-                          pollutantRegisterModel.carPlate +
+                          pollutantRegisterModel.carPlate
+                              .substring(0, pollutantRegisterModel.carPlate.length - 2) +
+                          "ایران" +
+                          pollutantRegisterModel.carPlate
+                              .substring(pollutantRegisterModel.carPlate.length - 2) +
                           "\n" +
                           "شماره همراه: " +
                           pollutantRegisterModel.driverMobile,
