@@ -1,5 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+import 'form_field.dart';
 
 class LSPlate extends StatefulWidget {
   // numbers are from left to right
@@ -36,6 +39,8 @@ class _LSPlateState extends State<LSPlate> {
     alpha = widget.letter.text;
     super.initState();
   }
+
+  TextEditingController carModelController = TextEditingController(text: "");
 
   @override
   Container build(BuildContext context) {
@@ -130,74 +135,82 @@ class _LSPlateState extends State<LSPlate> {
                               )),
                         ),
                         Center(
-                          child: widget.color != Colors.white
-                              ? Container(
-                                  margin: EdgeInsets.only(right: 14),
-                                  width: 45,
-                                  child: plateText(
-                                      controller: widget.letter, maxLength: 1, node: node))
-                              : Container(
-                                  width: 60,
-                                  margin: EdgeInsets.only(right: 7),
-                                  // decoration: BoxDecoration(
-                                  //   borderRadius: BorderRadius.circular(8),
-                                  //   color: widget.letter.text == 'ع'
-                                  //       ? Colors.yellow[700].withOpacity(0.4)
-                                  //       : Colors.white,
-                                  //   boxShadow: [
-                                  //     BoxShadow(
-                                  //         color: Colors.black.withOpacity(0.05),  spreadRadius: 1),
-                                  //   ],
-                                  // ),
-                                  color: (widget.letter != null && widget.letter.text == 'ع')
-                                      ? Colors.yellow[700]?.withOpacity(0.4)
-                                      : Colors.white,
-                                  //.withOpacity(0.9),
-                                  //     padding: EdgeInsets.symmetric(horizontal: 3.5),
-                                  child: DropdownButton<String>( ///TODO auto dropdown after focus
-                                    key: _dropdownKey,
-                                    value: alpha,
-                                    elevation: 16,
-                                    style: TextStyle(
-                                        fontFamily: "B Yekan", fontSize: 23, color: Colors.black87),
-                                    onChanged: (String? newValue) {
-                                      setState(() {
-                                        widget.letter.text = newValue!;
-                                        alpha = newValue;
-                                        // return node.nextFocus();
-                                        FocusScope.of(context).nextFocus();
-                                      });
-                                    },
-                                    underline: Container(
-                                      width: 45,
-                                    ),
-                                    items: <String>[
-                                      '-',
-                                      'ب',
-                                      'ج',
-                                      'د',
-                                      'س',
-                                      'ص',
-                                      'ط',
-                                      'ق',
-                                      'ل',
-                                      'م',
-                                      'ن',
-                                      'و',
-                                      'ه',
-                                      'ی',
-                                      'ژ',
-                                      'الف',
-                                      'ع',
-                                      'ش',
-                                      'پ',
-                                    ].map<DropdownMenuItem<String>>((String value) {
-                                      return DropdownMenuItem<String>(
-                                        value: value,
-                                        child: Text(value),
-                                      );
-                                    }).toList(),
-                                  )),
+                          child: Container(
+                            width: 60,
+                            height: 60,
+                            // margin: EdgeInsets.only(right: 7),
+                            color: (widget.letter != null && widget.letter.text == 'ع')
+                                ? Colors.yellow[700]?.withOpacity(0.4)
+                                : Colors.white,
+                            child: TextFormField(
+                              keyboardType: TextInputType.none,
+                              controller: carModelController,
+                              onTap: () async {
+                                await showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return Dialog(
+                                      child: Container(
+                                        width: 500, // Set a width for the dialog
+                                        height: 400, // Set a height for the dialog
+                                        child: Column(
+                                          children: [
+                                            Expanded(
+                                              child: ListView(
+                                                children: <String>[
+                                                  'الف',
+                                                  'ب',
+                                                  'پ',
+                                                  'ت',
+                                                  'ث',
+                                                  'ج',
+                                                  'چ',
+                                                  'ح',
+                                                  'خ',
+                                                  'د',
+                                                  'ذ',
+                                                  'ر',
+                                                  'ز',
+                                                  'ژ',
+                                                  'س',
+                                                  'ش',
+                                                  'ص',
+                                                  'ط',
+                                                  'ق',
+                                                  'ک',
+                                                  'گ',
+                                                  'ل',
+                                                  'م',
+                                                  'ن',
+                                                  'و',
+                                                  'ه',
+                                                  'ی'
+                                                ].map((String alphabet) {
+                                                  return ListTile(
+                                                    title: Text(alphabet),
+                                                    onTap: () {
+                                                      setState(() {
+                                                        carModelController.text =
+                                                            alphabet; // Update the text controller with the selected alphabet
+                                                        // pollutantRegisterModel.carModel = alphabet; // Assuming carModel is a string
+                                                        // Perform any additional logic needed
+                                                      });
+                                                      Navigator.of(context)
+                                                          .pop(); // Close the dialog
+                                                    },
+                                                  );
+                                                }).toList(),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                          ),
                         ),
                         Center(
                           child: Container(

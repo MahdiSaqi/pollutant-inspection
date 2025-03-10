@@ -16,6 +16,12 @@ class MyFormField extends  StatelessWidget{
     return Padding(
       padding: const EdgeInsets.all(15.0),
       child: TextFormField(
+        focusNode: FocusNode(),///for focus to next
+        textInputAction: TextInputAction.next,///for focus to next
+        onEditingComplete:() {
+          // Move focus to the next field
+          FocusScope.of(context).nextFocus();
+        },
         controller: controller,
         keyboardType: keyboardType,
         maxLength: maxLength,

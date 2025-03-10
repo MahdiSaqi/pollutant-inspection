@@ -28,7 +28,7 @@ import 'package:pollutant_inspection/widgets/dropdown_3.dart';
 import 'package:pollutant_inspection/widgets/dropdown_enum.dart';
 import 'package:pollutant_inspection/widgets/form_field.dart';
 import 'package:pollutant_inspection/widgets/dropdown_field.dart';
-import 'package:pollutant_inspection/widgets/lsplate.dart';
+import 'package:pollutant_inspection/widgets/lsplate2.dart';
 import 'package:pollutant_inspection/utility/map_to_list.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -56,6 +56,7 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
   bool hasTech = false; //برای مشاهده یا عدم مشاهده مراکز معاینه فنی
   bool hasAnalyzer = false;
   bool needTechnicalDiagnosis = false;
+  final ScrollController _scrollController = ScrollController();
 
   // Note: This is a `GlobalKey<FormState>`,
   // not a GlobalKey<MyCustomFormState>.
@@ -317,12 +318,13 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
     var tempOfficerID = pollutantRegisterModel.officerId;
     pollutantRegisterModel = PollutantRegisterModel();
     pollutantRegisterModel.officerId = tempOfficerID;
+    _scrollController.jumpTo(0);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
+    return SingleChildScrollView(
+      controller: _scrollController,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -446,12 +448,6 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
             },
           ),
 
-          // MyFormField(
-          //   labelText: 'مدل خودرو',
-          //   controller: carModelController,
-          //   keyboardType: TextInputType.number,
-          //   maxLength: 4,
-          // ),
           MyFormField(
             labelText: 'نام راننده',
             controller: nameController,
@@ -728,19 +724,33 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
               ElevatedButton(
                 ///دکمه صدور اخطار
                 onPressed: () async {
-                  var res = await Location().getCurrentLocation();
-                  if (res.statusCode != 0) {
-                    ShowModal(content: res.errors.toString(), title: 'خطا').Message(context);
-                    return;
-                  } else {
-                    var positionData = jsonDecode(res.data!);
-                    pollutantRegisterModel.lat = positionData['lat'];
-                    pollutantRegisterModel.lng = positionData['lng'];
-                  }
-                  pollutantRegisterModel.driverNationalCode = driverNationalCodeController.text;
+                  String strErrors = "";
+
+                  if (twoDigit.text.isEmpty ||
+                      threeDigit.text.isEmpty ||
+                      iranDigit.text.isEmpty ||
+                      letter.text == "-" ||
+                      twoDigit.text.length != 2 || // Check for 2 characters
+                      threeDigit.text.length != 3 || // Check for 3 characters
+                      iranDigit.text.length != 2 || // Check for 4 characters (Iranian format)
+                      letter.text.length != 1)
+                    strErrors += 'پلاک را به درستی وارد کنید' + '\n';
+                  else
+                    pollutantRegisterModel.carPlate =
+                        twoDigit.text + letter.text + threeDigit.text + iranDigit.text;
+
+                  if (driverNationalCodeController.text.length == 10)
+                    pollutantRegisterModel.driverNationalCode = driverNationalCodeController.text;
+                  else
+                    strErrors += 'کد ملی باید 10 رقم باشد' + '\n';
+
                   pollutantRegisterModel.driverName = nameController.text;
                   pollutantRegisterModel.driverFamily = familyController.text;
-                  pollutantRegisterModel.driverMobile = driverMobileController.text;
+                  if (driverMobileController.text.length == 11)
+                    pollutantRegisterModel.driverMobile = driverMobileController.text;
+                  else
+                    strErrors += 'تلفن همراه باید 11 رقم باشد' + '\n';
+
                   pollutantRegisterModel.driverAddress = driverAddressController.text;
                   pollutantRegisterModel.driverDriveLicence = driverDriveLicenseController.text;
 
@@ -777,28 +787,11 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
                   //       int.parse(carModelController.text);
                   //   print(carModelController.text);
                   // }
-                  pollutantRegisterModel.carPlate =
-                      twoDigit.text + letter.text + threeDigit.text + iranDigit.text;
 
                   //convert File To base64 image string
                   if (_base64Image != null) {
                     final bytes = await _base64Image!.readAsBytes();
                     pollutantRegisterModel.photo = base64Encode(bytes);
-                  }
-
-                  if (twoDigit.text.isEmpty ||
-                      threeDigit.text.isEmpty ||
-                      iranDigit.text.isEmpty ||
-                      letter.text == "-" ||
-                      twoDigit.text.length != 2 || // Check for 2 characters
-                      threeDigit.text.length != 3 || // Check for 3 characters
-                      iranDigit.text.length != 2 || // Check for 4 characters (Iranian format)
-                      letter.text.length != 1) {
-                    ShowModal(
-                            title: 'لطفا موارد زیر را رعایت کنید',
-                            content: 'پلاک را به درستی وارد کنید')
-                        .Message(context);
-                    return;
                   }
 
                   if (relationWithOwnerController.text == "0" ||
@@ -812,13 +805,8 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
                       //recordedDocumentController.text == "0" ||
                       carTypesController.text == "0" ||
                       districtController.text == "0" ||
-                      engineTypeController.text == "0") {
-                    ShowModal(
-                            content: 'لطفا موارد زیر را رعایت کنید',
-                            title: 'گزینه های بدون انتخاب را انتخاب کنید')
-                        .Message(context);
-                    return;
-                  }
+                      engineTypeController.text == "0")
+                    strErrors += 'گزینه های انتخاب نشده را انتخاب کنید' + '\n';
 
                   // print(pollutantRegisterModel.relationWithOwner.index.toString()+"=====================relationWithOwner.index");
                   // print(relationWithOwnerController.text);
@@ -828,6 +816,22 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
                   // var strOfficer = prefs.getString('officer');
                   // var officer = jsonDecode(strOfficer!);
                   // pollutantRegisterModel.officerId = int.parse(officer['id']);
+
+                  if (strErrors.length > 0) {
+                    ShowModal(title: 'خطا', content: strErrors).Message(context);
+                    return;
+                  }
+
+                  ///location checker and get lat lng
+                  var res = await Location().getCurrentLocation();
+                  if (res.statusCode != 0) {
+                    ShowModal(content: res.errors.toString(), title: 'خطا').Message(context);
+                    return;
+                  } else {
+                    var positionData = jsonDecode(res.data!);
+                    pollutantRegisterModel.lat = positionData['lat'];
+                    pollutantRegisterModel.lng = positionData['lng'];
+                  }
 
                   ShowModal(
                       title: 'اطلاعات زیر ثبت شود؟',

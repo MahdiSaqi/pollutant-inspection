@@ -5,15 +5,15 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 
 class MyResult {
-  int? statusCode;
+  int statusCode;
   List<String>? errors;
   String? data;
 
-  MyResult({this.statusCode, this.errors, this.data});
+  MyResult({required this.statusCode, this.errors, this.data});
 
   factory MyResult.fromJson(Map<String, dynamic> json) {
     return MyResult(
-      statusCode: json['statusCode'] as int?,
+      statusCode: json['statusCode'] as int,
       errors: json['errors'] != null ? List<String>.from(json['errors']) : null,
       data: jsonEncode(json['data']), //json['data'] as String?,
     );

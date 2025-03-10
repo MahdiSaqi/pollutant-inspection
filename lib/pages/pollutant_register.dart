@@ -29,9 +29,7 @@ class PollutantRegister extends StatelessWidget
         ),
         body: Directionality(
           textDirection: TextDirection.rtl,
-          child: SingleChildScrollView(
-              child: PollutantRegisterForm()
-          )
+          child: PollutantRegisterForm()
         ),
       ),
       canPop: false,

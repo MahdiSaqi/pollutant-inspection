@@ -20,7 +20,7 @@ class OfficerSelection extends StatefulWidget {
 class _OfficerSelectionState extends State<OfficerSelection> {
   //const OfficerSelection({Key? key}) : super(key: key);
   List<BaseDefinitionDTO> officers = [
-    BaseDefinitionDTO(id: "0", title: "عدم دریافت لیست"),
+    BaseDefinitionDTO(id: "-1", title: "عدم دریافت لیست"),
   ];
 
   TextEditingController officersController = TextEditingController(

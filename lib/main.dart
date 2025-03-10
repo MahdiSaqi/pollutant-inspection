@@ -80,13 +80,21 @@ class _NavigateToWebLoginState extends State<NavigateToWebLogin> {
       if (strLoginInfo != null) {
         var loginInfo = jsonDecode(strLoginInfo);
         var myRes = await GetBaseDefinitions().getData(loginInfo['token']);
-
         if (myRes.statusCode == 0) {
-          Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => LandingPage()
-                  //OfficerSelection()
-                  ));
+          var strOfficer = prefs?.getString('officer');
+          var officer = jsonDecode(strOfficer!);
+          if (int.parse(officer['id']) == -1)
+            Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => OfficerSelection()
+                    //OfficerSelection()
+                    ));
+          else
+            Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => LandingPage()
+                    //OfficerSelection()
+                    ));
 
           ///is code for test on local
           // Navigator.push(
@@ -144,14 +152,17 @@ class _NavigateToWebLoginState extends State<NavigateToWebLogin> {
       Loading.close(context);
 
       if (res != null && res.statusCode == 0) {
-
-
         var loginKey = jsonDecode(res.data!);
         Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => Container(child: WebLogin(loginKey))
                 // PollutantRegister()
                 ));
+      } else if (res?.statusCode == -2) {
+        setState(() {
+          isRetry = true;
+          loginMessage = "خطای ارتباط با اینترنت";
+        });
       } else {
         setState(() {
           isRetry = true;
@@ -161,8 +172,6 @@ class _NavigateToWebLoginState extends State<NavigateToWebLogin> {
             for (var i in res.errors!) loginMessage += i + "\n";
           } else {
             loginMessage = 'خطای ناشناخته!';
-            //TODO print
-            print(res);
           }
         });
       }
@@ -192,7 +201,7 @@ class _NavigateToWebLoginState extends State<NavigateToWebLogin> {
                   isRetry = false;
                   loginMessage = "ورود به صفحه لاگین";
                 });
-                loginKey();
+                _initialize();
               },
               child: Text("تلاش مجدد"))
       ],
