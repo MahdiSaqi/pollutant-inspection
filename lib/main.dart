@@ -161,7 +161,7 @@ class _NavigateToWebLoginState extends State<NavigateToWebLogin> {
       } else if (res?.statusCode == -2) {
         setState(() {
           isRetry = true;
-          loginMessage = "خطای ارتباط با اینترنت";
+          loginMessage = 'اتصال به اینترنت را بررسی کنید';
         });
       } else {
         setState(() {

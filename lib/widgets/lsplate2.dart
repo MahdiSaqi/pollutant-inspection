@@ -27,24 +27,106 @@ class LSPlate extends StatefulWidget {
 }
 
 class _LSPlateState extends State<LSPlate> {
-  // int number1;
-  // int number2;
-  // int number3;
-  String alpha = '';
-  FocusNode? focusNode;
-  final GlobalKey _dropdownKey = GlobalKey();
+  FocusNode letterFocus = FocusNode(),
+      twoDigitFocus = FocusNode(),
+      threeDigitFocus = FocusNode(),
+      iranDigitFocus = FocusNode();
+
+  // final GlobalKey _dropdownKey = GlobalKey();
 
   @override
   void initState() {
-    alpha = widget.letter.text;
     super.initState();
+    widget.letter.addListener(() {
+      if(!isDigit(widget.letter.text))
+        FocusScope.of(context).nextFocus();
+        // threeDigitFocus.requestFocus();
+    });
   }
 
-  TextEditingController carModelController = TextEditingController(text: "");
+
+  showLetterPlate() async {
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: Container(
+            width: 300, // Set a width for the dialog
+            height: 400, // Set a height for the dialog
+            child: Column(
+              children: [
+                // Padding(
+                //   padding: const EdgeInsets.all(16.0),
+                //   child: Text(
+                //     'Select an Alphabet',
+                //     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                //   ),
+                // ),
+                Expanded(
+                  child: GridView.count(
+                    crossAxisCount: 5,
+                    semanticChildCount: 5,
+                    // Number of columns in the grid
+                    children: <String>[
+                      'ب',
+                      'ج',
+                      'د',
+                      'س',
+                      'ص',
+                      'ط',
+                      'ق',
+                      'ل',
+                      'م',
+                      'ن',
+                      'و',
+                      'ه',
+                      'ی',
+                      'ژ',
+                      'الف',
+                      'ث',
+                      'پ',
+                      'ش',
+                      'ع',
+                      'ت'
+                    ].map((String alphabet) {
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            widget.letter.text = alphabet;
+                          });
+                          Navigator.of(context).pop();
+                        },
+                        child: Card(
+                          margin: EdgeInsets.all(8.0),
+                          // Margin around each card
+                          child: Center(
+                            child: Text(
+                              alphabet,
+                              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  bool isDigit(String input) {
+    return input.runes.every((int rune) {
+      var character = String.fromCharCode(rune);
+      return character.contains(RegExp(r'\d')); // Check if it's a digit
+    });
+  }
 
   @override
   Container build(BuildContext context) {
-    final node = FocusScope.of(context);
 
     return Container(
       child: Center(
@@ -55,64 +137,19 @@ class _LSPlateState extends State<LSPlate> {
           // margin: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
           decoration: BoxDecoration(
               image: DecorationImage(
-            image:
-                (widget.color == Colors.white && widget.letter != null && widget.letter.text != 'ع')
-                    ? AssetImage("lib/assets/images/plate_modat.png")
-                    : AssetImage("lib/assets/images/plate.png"),
+            image: (widget.color == Colors.white &&
+                    widget.letter != null &&
+                    widget.letter.text != 'ع' &&
+                    widget.letter.text != 'ت')
+                ? AssetImage("lib/assets/images/plate_modat.png")
+                : (widget.letter.text == 'ع')
+                    ? AssetImage("lib/assets/images/plate.png")
+                    : AssetImage("lib/assets/images/plate_taxi.png"),
           )),
           child: Directionality(
             textDirection: TextDirection.ltr,
             child: Stack(
               children: [
-                // Positioned(
-                //   left: 90,
-                //   top: 20,
-                //   child: Container(
-                //     width: 45,
-                //     color: Colors.yellow[700],//.withOpacity(0.9),
-                //       padding: EdgeInsets.symmetric(horizontal: 3.5),
-                //       child: DropdownButton<String>(
-                //     value: alpha,
-                //     elevation: 16,
-                //     style: TextStyle(
-                //         fontFamily: "Shabnam",
-                //         fontSize: 23,
-                //         color: Colors.black87),
-                //     onChanged: (String newValue) {
-                //       setState(() {
-                //         widget.letter.text = newValue;
-                //         alpha = newValue;
-                //         return node.nextFocus();
-                //       });
-                //     },
-                //     underline: Container(width: 45,),
-                //     items: <String>[
-                //       // 'ب',
-                //       // 'ج',
-                //       // 'د',
-                //       // 'س',
-                //       // 'ص',
-                //       // 'ط',
-                //       // 'ق',
-                //       // 'ل',
-                //       // 'م',
-                //       // 'ن',
-                //       // 'و',
-                //       // 'ه',
-                //       // 'ی',
-                //       // 'ژ',
-                //       // 'الف',
-                //       'ع',
-                //       // 'ش',
-                //       // 'پ',
-                //     ].map<DropdownMenuItem<String>>((String value) {
-                //       return DropdownMenuItem<String>(
-                //         value: value,
-                //         child: Text(value),
-                //       );
-                //     }).toList(),
-                //   )),
-                // ),
                 Positioned(
                   left: 40,
                   top: 30,
@@ -128,9 +165,10 @@ class _LSPlateState extends State<LSPlate> {
                               margin: EdgeInsets.only(right: 7),
                               width: 45,
                               child: plateText(
+                                onTap: () {},
                                 controller: widget.twoDigit,
                                 maxLength: 2,
-                                node: node,
+                                node: twoDigitFocus,
                                 autoFocus: true,
                               )),
                         ),
@@ -139,75 +177,21 @@ class _LSPlateState extends State<LSPlate> {
                             width: 60,
                             height: 60,
                             // margin: EdgeInsets.only(right: 7),
-                            color: (widget.letter != null && widget.letter.text == 'ع')
-                                ? Colors.yellow[700]?.withOpacity(0.4)
-                                : Colors.white,
-                            child: TextFormField(
+                            color: (widget.letter != null &&
+                                    widget.letter.text != 'ع' &&
+                                    widget.letter.text != 'ت')
+                                ? Colors.white
+                                : (widget.letter.text == 'ع')
+                                    ? Colors.yellow[700]?.withOpacity(0.4)
+                                    : Colors.yellow,
+                            child: plateText(
+                              //autoFocus: true,
                               keyboardType: TextInputType.none,
-                              controller: carModelController,
+                              node: letterFocus,
+                              maxLength: 1,
+                              controller: widget.letter,
                               onTap: () async {
-                                await showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return Dialog(
-                                      child: Container(
-                                        width: 500, // Set a width for the dialog
-                                        height: 400, // Set a height for the dialog
-                                        child: Column(
-                                          children: [
-                                            Expanded(
-                                              child: ListView(
-                                                children: <String>[
-                                                  'الف',
-                                                  'ب',
-                                                  'پ',
-                                                  'ت',
-                                                  'ث',
-                                                  'ج',
-                                                  'چ',
-                                                  'ح',
-                                                  'خ',
-                                                  'د',
-                                                  'ذ',
-                                                  'ر',
-                                                  'ز',
-                                                  'ژ',
-                                                  'س',
-                                                  'ش',
-                                                  'ص',
-                                                  'ط',
-                                                  'ق',
-                                                  'ک',
-                                                  'گ',
-                                                  'ل',
-                                                  'م',
-                                                  'ن',
-                                                  'و',
-                                                  'ه',
-                                                  'ی'
-                                                ].map((String alphabet) {
-                                                  return ListTile(
-                                                    title: Text(alphabet),
-                                                    onTap: () {
-                                                      setState(() {
-                                                        carModelController.text =
-                                                            alphabet; // Update the text controller with the selected alphabet
-                                                        // pollutantRegisterModel.carModel = alphabet; // Assuming carModel is a string
-                                                        // Perform any additional logic needed
-                                                      });
-                                                      Navigator.of(context)
-                                                          .pop(); // Close the dialog
-                                                    },
-                                                  );
-                                                }).toList(),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                );
+                                await showLetterPlate();
                               },
                             ),
                           ),
@@ -217,7 +201,11 @@ class _LSPlateState extends State<LSPlate> {
                               margin: EdgeInsets.only(right: 14),
                               width: 60,
                               child: plateText(
-                                  controller: widget.threeDigit, maxLength: 3, node: node)),
+                                  // autoFocus: true,
+                                  onTap: () {},
+                                  controller: widget.threeDigit,
+                                  maxLength: 3,
+                                  node: threeDigitFocus)),
                         ),
                       ],
                     ),
@@ -231,7 +219,12 @@ class _LSPlateState extends State<LSPlate> {
                   child: Container(
                     width: 45,
                     child: plateText(
-                        controller: widget.iranDigit, maxLength: 2, node: node, autoFocus: false),
+                      onTap: () {},
+                      controller: widget.iranDigit,
+                      maxLength: 2,
+                      node: iranDigitFocus,
+                      // autoFocus: false
+                    ),
                   ),
                 )
               ],
@@ -248,37 +241,36 @@ class _LSPlateState extends State<LSPlate> {
       double fontSize = 27,
       EdgeInsets padding = const EdgeInsets.symmetric(vertical: 0),
       required FocusNode node,
-      bool autoFocus = false}) {
+      bool autoFocus = false,
+      required Function() onTap,
+      TextInputType keyboardType = TextInputType.number}) {
     return TextFormField(
+      onTap: onTap,
       controller: controller,
       cursorColor: Colors.black,
       style: TextStyle(fontSize: fontSize),
       textAlign: TextAlign.center,
       textAlignVertical: TextAlignVertical.top,
       maxLength: maxLength,
-      readOnly: (controller.text != null && controller.text == 'ع' || widget.enable == false)
+      readOnly: (controller.text != null && !isDigit(controller.text) || widget.enable == false)
           ? true
           : false,
       //  enabled:
       //      (controller.text != 'ع' && widget.enable == false) ? false : true,
       // enabled: (controller.text=='ع' || DataModel.of(context).loadMap==false && widget.color!=Colors.white )? false:true,
       enableInteractiveSelection: false,
-      keyboardType: TextInputType.number,
+      keyboardType: keyboardType,
       textInputAction: TextInputAction.next,
       autofocus: autoFocus,
       onChanged: (value) {
-        // print('inaja 3');
-        // print(value.toString());
         if (value.length == maxLength) {
-          //   print('33333');
+          if (node == twoDigitFocus) {
+            showLetterPlate();
+          }
           FocusScope.of(context).nextFocus();
-          //   if (value.length == 2 &&  widget.letter != null /*&&
-          //       widget.letter.text == 'ع'*/)
-          //     // FocusScope.of(context).nextFocus();
-          //     // focusNode!.requestFocus();
 
-          GestureDetector? detector =
-              _dropdownKey.currentContext?.findAncestorWidgetOfExactType<GestureDetector>();
+          // GestureDetector? detector =
+          //     _dropdownKey.currentContext?.findAncestorWidgetOfExactType<GestureDetector>();
         }
       },
 
@@ -286,17 +278,21 @@ class _LSPlateState extends State<LSPlate> {
       //  onEditingComplete: () {
       //    return node.nextFocus();
       // },
-      decoration: new InputDecoration(
+      decoration: InputDecoration(
           border: OutlineInputBorder(
             borderSide: BorderSide(color: Colors.black.withOpacity(0.09), width: 1.0),
             borderRadius: const BorderRadius.all(
               const Radius.circular(8.0),
             ),
           ),
-          fillColor:
-              (widget.color == Colors.white && widget.letter != null && widget.letter.text != 'ع')
-                  ? widget.color
-                  : Colors.yellow[700]?.withOpacity(0.4),
+          fillColor: (widget.color == Colors.white &&
+                  widget.letter != null &&
+                  widget.letter.text != 'ع' &&
+                  widget.letter.text != 'ت')
+              ? widget.color
+              : (widget.letter.text == 'ع')
+                  ? Colors.yellow[700]?.withOpacity(0.4)
+                  : Colors.yellow,
           //  fillColor: Colors.yellow[700].withOpacity(0.4),
           //.withOpacity(0.9),
           filled: true,
