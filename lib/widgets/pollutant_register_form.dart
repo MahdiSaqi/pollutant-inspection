@@ -56,6 +56,7 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
   bool hasTech = false; //برای مشاهده یا عدم مشاهده مراکز معاینه فنی
   bool hasAnalyzer = false;
   bool needTechnicalDiagnosis = false;
+  bool hasRecordedDocument = false;
   final ScrollController _scrollController = ScrollController();
 
   // Note: This is a `GlobalKey<FormState>`,
@@ -76,16 +77,19 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
     BaseDefinitionDTO(id: "10", title: 'مادر'),
     BaseDefinitionDTO(id: "11", title: 'فامیل وابسته'),
   ];
+  List<BaseDefinitionDTO> actionTypeItems = [
+    BaseDefinitionDTO(id: '8', title: 'درخواست توقیف پلاک'),
+    BaseDefinitionDTO(id: '9', title: 'اخذ مدرک'),
+  ];
   List<BaseDefinitionDTO> recordedDocumentItems = [
-    BaseDefinitionDTO(id: '0', title: 'فاقد مدرک'),
-    BaseDefinitionDTO(id: '1', title: 'گواهی نامه'),
-    BaseDefinitionDTO(id: '2', title: 'کارت ملی'),
-    BaseDefinitionDTO(id: '3', title: 'کارت خودرو'),
-    BaseDefinitionDTO(id: '4', title: 'قبض پارکینگ'),
-    BaseDefinitionDTO(id: '5', title: 'شناسنامه'),
-    BaseDefinitionDTO(id: '6', title: 'جواز کسب'),
-    BaseDefinitionDTO(id: '7', title: 'سند خودرو'),
-    BaseDefinitionDTO(id: '8', title: 'کارت پایان خدمت'),
+    BaseDefinitionDTO(id: '0', title: 'گواهی نامه'),
+    BaseDefinitionDTO(id: '1', title: 'کارت ملی'),
+    BaseDefinitionDTO(id: '2', title: 'کارت خودرو'),
+    BaseDefinitionDTO(id: '3', title: 'بیمه نامه'),
+    BaseDefinitionDTO(id: '4', title: 'شناسنامه'),
+    BaseDefinitionDTO(id: '5', title: 'جواز کسب'),
+    BaseDefinitionDTO(id: '6', title: 'سند خودرو'),
+    BaseDefinitionDTO(id: '7', title: 'کارت پایان خدمت'),
     //BaseDefinitionDTO(id: '9', title: 'درخواست توقیف پلاک'),
   ];
 
@@ -130,11 +134,6 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
     BaseDefinitionDTO(id: '1', title: 'خام سوزی'),
   ];
 
-  List<BaseDefinitionDTO> actionTypeItems = [
-    BaseDefinitionDTO(id: '0', title: 'درخواست توقیف پلاک'),
-    BaseDefinitionDTO(id: '1', title: 'اخذ مدرک'),
-  ];
-
   ///load from storage(sharedPreferences)
   List<BaseDefinitionDTO> carTypes = [BaseDefinitionDTO(id: '0', title: 'عدم دریافت لیست')];
 
@@ -167,7 +166,7 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
       dateController = TextEditingController(text: "0"),
       //plate controllers
       twoDigit = TextEditingController(text: ""),
-      letter = TextEditingController(text: "-"),
+      letter = TextEditingController(text: ""),
       threeDigit = TextEditingController(text: ""),
       iranDigit = TextEditingController(text: ""),
       //analyzer values
@@ -577,14 +576,23 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
             selected: actionTypeController,
             onChanged: (selectedValue) {
               _onChanged(selectedValue);
+              int id = int.parse(selectedValue['id']);
+              if (id == 8)
+                setState(() {
+                  pollutantRegisterModel.recordedDocument = id;
+                  hasRecordedDocument = false;
+                });
+              else
+                setState(() {
+                  pollutantRegisterModel.recordedDocument = -1;
+                  recordedDocumentController.text="0";
+                  hasRecordedDocument = true;
+                });
 
-              setState(() {
-                pollutantRegisterModel.recordedDocument = int.parse(selectedValue['id']);
-              });
             },
           ),
 
-          if (pollutantRegisterModel.recordedDocument == 1)
+          if (hasRecordedDocument)
             DropdownList(
               key: GlobalKey(),
               title: "مدرک ضبط شده",
@@ -592,7 +600,7 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
               selected: recordedDocumentController,
               onChanged: (selectedValue) {
                 _onChanged(selectedValue);
-                pollutantRegisterModel.recordedDocument = int.parse(selectedValue['id']) + 1;
+                pollutantRegisterModel.recordedDocument = int.parse(selectedValue['id']);
               },
             ),
 

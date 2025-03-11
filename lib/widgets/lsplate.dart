@@ -154,7 +154,7 @@ class _LSPlateState extends State<LSPlate> {
                                       : Colors.white,
                                   //.withOpacity(0.9),
                                   //     padding: EdgeInsets.symmetric(horizontal: 3.5),
-                                  child: DropdownButton<String>( ///TODO auto dropdown after focus
+                                  child: DropdownButton<String>(
                                     key: _dropdownKey,
                                     value: alpha,
                                     elevation: 16,
