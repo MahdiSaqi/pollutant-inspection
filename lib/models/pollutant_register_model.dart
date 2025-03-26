@@ -115,7 +115,7 @@ class PollutantRegisterModel {
   String driverMobile = "";
   String driverNationalCode = "";
   String driverAddress = "";
-  String driverDriveLicence = "";
+  //String driverDriveLicence = "";
   int carTypeId = 0;
   int carModel = 0;
   int engineType = -1;
@@ -152,7 +152,7 @@ class PollutantRegisterModel {
       'ownerMobile': driverMobile,
       'ownerNationalCode': driverNationalCode,
       'ownerAddress': driverAddress,
-      'ownerDriveLicence': driverDriveLicence,
+      //'ownerDriveLicence': driverDriveLicence,
       'carTypeId': carTypeId,
       'carModel': carModel,
       'engineType': engineType,
@@ -182,7 +182,7 @@ class PollutantRegisterModel {
       ..driverMobile = json['ownerMobile'] ?? ""
       ..driverNationalCode = json['ownerNationalCode'] ?? ""
       ..driverAddress = json['ownerAddress'] ?? ""
-      ..driverDriveLicence = json['ownerDriveLicence'] ?? ""
+      //..driverDriveLicence = json['ownerDriveLicence'] ?? ""
       ..carTypeId = json['carTypeId'] ?? 0
       ..carModel = json['carModel'] ?? 0
       ..engineType = json['engineType'] ?? -1

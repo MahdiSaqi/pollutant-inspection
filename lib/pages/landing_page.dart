@@ -126,7 +126,6 @@ import '../server_utility/get_base_definitions.dart';
 class LandingPage extends StatefulWidget {
   LandingPage({Key? key}) : super(key: key) {}
 
-
   @override
   State<LandingPage> createState() => _LandingPageState();
 }
@@ -140,7 +139,7 @@ class _LandingPageState extends State<LandingPage> {
         textDirection: TextDirection.rtl,
         child: Scaffold(
           appBar: AppBar(
-            automaticallyImplyLeading: false,
+            // automaticallyImplyLeading: false,
             title: Text(Constants.appTitle),
           ),
           body: SafeArea(
@@ -148,7 +147,7 @@ class _LandingPageState extends State<LandingPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Column(
-                  // mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     SizedBox(
@@ -159,6 +158,8 @@ class _LandingPageState extends State<LandingPage> {
                       height: 20,
                     ),
                     ElevatedButton(
+
+                        ///'صدور اخطار خودروی آلاینده'
                         onPressed: () async {
                           try {
                             var prefs = await SharedPreferences.getInstance();
@@ -167,9 +168,18 @@ class _LandingPageState extends State<LandingPage> {
                               var loginInfo = jsonDecode(strLoginInfo);
                               var myRes = await GetBaseDefinitions().getData(loginInfo['token']);
                               if (myRes.statusCode == 0) {
-                                prefs?.setString('baseDefinitions', myRes.data!);
-                                Navigator.push(context,
-                                    MaterialPageRoute(builder: (context) => PollutantRegister()));
+                                var data = jsonDecode(myRes.data!);
+                                if (data['isInWorkingShift'] == true) {
+                                  prefs?.setString('baseDefinitions', myRes.data!);
+                                  Navigator.push(context,
+                                      MaterialPageRoute(builder: (context) => PollutantRegister()));
+                                }else{
+                                  ShowModal(
+                                    content: 'شیفت کاری شما فعال نمی باشد',
+                                    title: 'خطا',
+                                  ).Message(context);
+
+                                }
                               } else {
                                 ShowModal(
                                   content: myRes.errors.toString(),
@@ -202,13 +212,19 @@ class _LandingPageState extends State<LandingPage> {
                     ),
                     ElevatedButton(
                       onPressed: () async {
-                        var prefs = await SharedPreferences.getInstance();
-                        await prefs.clear();
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(builder: (context) => MyHomePage(title: Constants.appTitle)),
-                          // Replace with your actual login screen widget
-                              (route) => false, // Remove all previous routes
-                        );
+                        ShowModal(
+                            title: 'برگشت به صفحه ورود',
+                            content: 'از برگشت به صفحه ورود اطمینان دارید',
+                            onOkPressed: () async {
+                              var prefs = await SharedPreferences.getInstance();
+                              await prefs.clear();
+                              Navigator.of(context).pushAndRemoveUntil(
+                                MaterialPageRoute(
+                                    builder: (context) => MyHomePage(title: Constants.appTitle)),
+                                // Replace with your actual login screen widget
+                                (route) => false, // Remove all previous routes
+                              );
+                            }).Message(context);
                       },
                       child: Text(
                         'خروج از حساب کاربری',
@@ -218,6 +234,8 @@ class _LandingPageState extends State<LandingPage> {
                       ),
                     ),
                     //GetCurrentLocation(),///for test
+                    SizedBox(height: 250,),
+                    Text( 'طراحی توسط فتاپ نسخه 1')
                   ],
                 ),
               ],
