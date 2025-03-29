@@ -16,11 +16,12 @@ class MyFormField extends  StatelessWidget{
     return Padding(
       padding: const EdgeInsets.all(15.0),
       child: TextFormField(
+        maxLines: null, ///multi line
         focusNode: FocusNode(),///for focus to next
         textInputAction: TextInputAction.next,///for focus to next
         onEditingComplete:() {
           // Move focus to the next field
-          FocusScope.of(context).nextFocus();
+          // FocusScope.of(context).nextFocus();
         },
         controller: controller,
         keyboardType: keyboardType,
@@ -46,6 +47,9 @@ class MyFormField extends  StatelessWidget{
             {
               FocusScope.of(context).nextFocus();
             };
+        },
+        onFieldSubmitted: (value){
+          FocusScope.of(context).nextFocus();
         },
         autovalidateMode: AutovalidateMode.onUserInteraction,
         validator: validator,/*(String? value) {

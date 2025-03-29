@@ -119,6 +119,7 @@ class PollutantRegisterModel {
   int carTypeId = 0;
   int carModel = 0;
   int engineType = -1;
+  bool isDual=false;
   int fuelType = -1;
   bool hasTechnicalDiagnosis = false;
   String? technicalDiagnosisDateTime;
@@ -156,6 +157,7 @@ class PollutantRegisterModel {
       'carTypeId': carTypeId,
       'carModel': carModel,
       'engineType': engineType,
+      'isDual' : isDual,
       'fuelType': fuelType,
       'hasTechnicalDiagnosis': hasTechnicalDiagnosis,
       'technicalDiagnosisDateTime': technicalDiagnosisDateTime,
@@ -166,7 +168,7 @@ class PollutantRegisterModel {
       'lng': lng,
       'officerId': officerId,
       'cityZone': cityZone,
-      'pollutantsValue': toJson2()['pollutantsValue'],
+      'pollutantsValue': toJson2()['pollutantsValue'],//مقادیر آلایندگی اکسیژن و کدورت و غیره
       'photo': photo,
     };
   }

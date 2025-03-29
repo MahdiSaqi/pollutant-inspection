@@ -14,13 +14,12 @@ class LSPlate extends StatefulWidget {
   final bool enable;
 
 //
-  LSPlate(
-      {required this.twoDigit,
-      required this.letter,
-      required this.threeDigit,
-      required this.iranDigit,
-      required this.color,
-      this.enable = true});
+  LSPlate({required this.twoDigit,
+    required this.letter,
+    required this.threeDigit,
+    required this.iranDigit,
+    required this.color,
+    this.enable = true});
 
   @override
   _LSPlateState createState() => _LSPlateState();
@@ -34,16 +33,23 @@ class _LSPlateState extends State<LSPlate> {
 
   // final GlobalKey _dropdownKey = GlobalKey();
 
+
+
+
   @override
   void initState() {
     super.initState();
-    widget.letter.addListener(() {
-      if(!isDigit(widget.letter.text))
-        FocusScope.of(context).nextFocus();
-        // threeDigitFocus.requestFocus();
+    widget.threeDigit.addListener(() {
+      if (widget.threeDigit.text.length==3) FocusScope.of(context).requestFocus(iranDigitFocus);
+      // threeDigitFocus.requestFocus();
     });
-  }
+    widget.letter.addListener(() {
+      // FocusScope.of(context).requestFocus(threeDigitFocus);
+      threeDigitFocus.requestFocus();
+    });
 
+
+  }
 
   showLetterPlate() async {
     await showDialog(
@@ -127,7 +133,6 @@ class _LSPlateState extends State<LSPlate> {
 
   @override
   Container build(BuildContext context) {
-
     return Container(
       child: Center(
         child: Container(
@@ -137,22 +142,22 @@ class _LSPlateState extends State<LSPlate> {
           // margin: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
           decoration: BoxDecoration(
               image: DecorationImage(
-            image: (widget.color == Colors.white &&
+                image: (widget.color == Colors.white &&
                     widget.letter != null &&
                     widget.letter.text != 'ع' &&
                     widget.letter.text != 'ت')
-                ? AssetImage("lib/assets/images/plate_modat.png")
-                : (widget.letter.text == 'ع')
+                    ? AssetImage("lib/assets/images/plate_modat.png")
+                    : (widget.letter.text == 'ع')
                     ? AssetImage("lib/assets/images/plate.png")
                     : AssetImage("lib/assets/images/plate_taxi.png"),
-          )),
+              )),
           child: Directionality(
             textDirection: TextDirection.ltr,
             child: Stack(
               children: [
                 Positioned(
                   left: 40,
-                  top: 30,
+                  top: 20,
                   bottom: 20,
                   //right: 54,
                   child: Padding(
@@ -165,6 +170,7 @@ class _LSPlateState extends State<LSPlate> {
                               margin: EdgeInsets.only(right: 7),
                               width: 45,
                               child: plateText(
+                                ///---------------------------------------------------------2 digit
                                 onTap: () {},
                                 controller: widget.twoDigit,
                                 maxLength: 2,
@@ -174,17 +180,20 @@ class _LSPlateState extends State<LSPlate> {
                         ),
                         Center(
                           child: Container(
+                            margin: EdgeInsets.only(right: 7),
                             width: 60,
                             height: 60,
                             // margin: EdgeInsets.only(right: 7),
                             color: (widget.letter != null &&
-                                    widget.letter.text != 'ع' &&
-                                    widget.letter.text != 'ت')
+                                widget.letter.text != 'ع' &&
+                                widget.letter.text != 'ت')
                                 ? Colors.white
                                 : (widget.letter.text == 'ع')
-                                    ? Colors.yellow[700]?.withOpacity(0.4)
-                                    : Colors.yellow,
+                                ? Colors.yellow[700]?.withOpacity(0.4)
+                                : Colors.yellow,
                             child: plateText(
+
+                              ///----------------------------------------------------------letter
                               //autoFocus: true,
                               keyboardType: TextInputType.none,
                               node: letterFocus,
@@ -201,7 +210,8 @@ class _LSPlateState extends State<LSPlate> {
                               margin: EdgeInsets.only(right: 14),
                               width: 60,
                               child: plateText(
-                                  // autoFocus: true,
+                                ///------------------------------------------------------3 digit
+                                // autoFocus: true,
                                   onTap: () {},
                                   controller: widget.threeDigit,
                                   maxLength: 3,
@@ -219,6 +229,7 @@ class _LSPlateState extends State<LSPlate> {
                   child: Container(
                     width: 45,
                     child: plateText(
+                      ///--------------------------------------------------------------iran digit
                       onTap: () {},
                       controller: widget.iranDigit,
                       maxLength: 2,
@@ -235,15 +246,14 @@ class _LSPlateState extends State<LSPlate> {
     );
   }
 
-  TextFormField plateText(
-      {required TextEditingController controller,
-      required int maxLength,
-      double fontSize = 27,
-      EdgeInsets padding = const EdgeInsets.symmetric(vertical: 0),
-      required FocusNode node,
-      bool autoFocus = false,
-      required Function() onTap,
-      TextInputType keyboardType = TextInputType.number}) {
+  TextFormField plateText({required TextEditingController controller,
+    required int maxLength,
+    double fontSize = 27,
+    EdgeInsets padding = const EdgeInsets.symmetric(vertical: 0),
+    required FocusNode node,
+    bool autoFocus = false,
+    required Function() onTap,
+    TextInputType keyboardType = TextInputType.number}) {
     return TextFormField(
       onTap: onTap,
       controller: controller,
@@ -262,12 +272,13 @@ class _LSPlateState extends State<LSPlate> {
       keyboardType: keyboardType,
       textInputAction: TextInputAction.next,
       autofocus: autoFocus,
+
       onChanged: (value) {
         if (value.length == maxLength) {
           if (node == twoDigitFocus) {
             showLetterPlate();
           }
-          FocusScope.of(context).nextFocus();
+          // FocusScope.of(context).nextFocus();
 
           // GestureDetector? detector =
           //     _dropdownKey.currentContext?.findAncestorWidgetOfExactType<GestureDetector>();
@@ -286,13 +297,13 @@ class _LSPlateState extends State<LSPlate> {
             ),
           ),
           fillColor: (widget.color == Colors.white &&
-                  widget.letter != null &&
-                  widget.letter.text != 'ع' &&
-                  widget.letter.text != 'ت')
+              widget.letter != null &&
+              widget.letter.text != 'ع' &&
+              widget.letter.text != 'ت')
               ? widget.color
               : (widget.letter.text == 'ع')
-                  ? Colors.yellow[700]?.withOpacity(0.4)
-                  : Colors.yellow,
+              ? Colors.yellow[700]?.withOpacity(0.4)
+              : Colors.yellow,
           //  fillColor: Colors.yellow[700].withOpacity(0.4),
           //.withOpacity(0.9),
           filled: true,

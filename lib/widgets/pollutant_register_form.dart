@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'dart:io' as dartIO;
 
-//import 'package:flutter/cupertino.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
@@ -55,6 +55,7 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
   bool needTechnicalDiagnosis = false;
   bool hasRecordedDocument = false;
   final ScrollController _scrollController = ScrollController();
+  bool DualSelected = false;
 
   // Note: This is a `GlobalKey<FormState>`,
   // not a GlobalKey<MyCustomFormState>.
@@ -294,6 +295,8 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
     threeDigit.clear();
     iranDigit.clear();
     dateController.clear();
+    DualSelected = false;
+    _clearPollutantValues();
 
     setState(() {
       // officersController.text="0"; //چون در همه ثبت های آن لاگین افسر شیفت تغییر نمی کند
@@ -318,6 +321,17 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
     _scrollController.jumpTo(0);
   }
 
+  void _clearPollutantValues(){
+    pollutantTypeController.text = "0";
+    O2Controller.clear();
+    LambdaController.clear();
+    COController.clear();
+    HCController.clear();
+    NOController.clear();
+    CO2Controller.clear();
+    OpacityController.clear();
+    KController.clear();
+  }
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -374,24 +388,41 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
                 }
               },
               child: Icon(Icons.search)),
-          DropdownList(
-            key: GlobalKey(),
-            title: "نوع موتور خودرو",
-            items: MapConvertor.MapToList(engineTypeItems),
-            selected: engineTypeController,
-            onChanged: (selectedValue) {
-              _onChanged(selectedValue);
-              setState(() {
-                pollutantRegisterModel.engineType = int.parse(selectedValue['id']);
-                if (pollutantRegisterModel.engineType == -1) {
-                  carTypesController.text = "0";
-                } else if (pollutantRegisterModel.engineType == 0) {
-                  carTypesController.text = "0";
-                } else if (pollutantRegisterModel.engineType == 1) {
-                  carTypesController.text = "0";
-                }
-              });
-            },
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: DropdownList(
+                  key: GlobalKey(),
+                  title: "نوع موتور خودرو",
+                  items: MapConvertor.MapToList(engineTypeItems),
+                  selected: engineTypeController,
+                  onChanged: (selectedValue) {
+                    _onChanged(selectedValue);
+                    setState(() {
+                      _clearPollutantValues();
+                      pollutantRegisterModel.engineType = int.parse(selectedValue['id']);
+                      if (pollutantRegisterModel.engineType == -1) {
+                        carTypesController.text = "0";
+                      } else if (pollutantRegisterModel.engineType == 0) {
+                        carTypesController.text = "0";
+                      } else if (pollutantRegisterModel.engineType == 1) {
+                        carTypesController.text = "0";
+                      }
+                    });
+                  },
+                ),
+              ),
+              Text('دوگانه'),
+              Switch(
+                  value: DualSelected,
+                  onChanged: (bool value) {
+                    setState(() {
+                      DualSelected = value;
+                    });
+                    pollutantRegisterModel.isDual = value;
+                  }),
+            ],
           ),
           DropdownList(
             key: GlobalKey(),
@@ -420,11 +451,6 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
               pollutantRegisterModel.carTypeId = int.parse(selectedValue['id']);
             },
           ),
-          // YearPicker(
-          //     firstDate: DateTime(1400),
-          //     lastDate: DateTime(1420),
-          //     selectedDate: DateTime(1400),
-          //     onChanged: (selected) {}),
 
           MyFormField(
             labelText: 'مدل خودرو',
@@ -507,6 +533,7 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
             selected: analyzeMethodController,
             onChanged: (selectedValue) {
               _onChanged(selectedValue);
+              _clearPollutantValues();
               setState(() {
                 if (selectedValue['value'] == "2")
                   hasAnalyzer = true;
@@ -516,7 +543,7 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
               pollutantRegisterModel.pollutionAnalyzeMethod = int.parse(selectedValue['id']);
             },
           ),
-          if (!hasAnalyzer)
+          if (analyzeMethodController.text != "0" && !hasAnalyzer)
             DropdownList(
               key: GlobalKey(),
               title: "نوع آلایندگی",
@@ -636,7 +663,6 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
             )
           else
             Text('معاینه فنی نیاز ندارد'),
-
           if (needTechnicalDiagnosis && hasTech)
             MyFormField(
               keyboardType: TextInputType.none,
@@ -774,6 +800,60 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
                           (OpacityController.text.isEmpty || KController.text.isEmpty)))
                     strErrors += 'مقادیر دستگاه آنالایزر وارد نشده است' + '\n';
 
+                  if (carModelController.text == "") {
+                    strErrors += 'مدل خودرو وارد نشده است' + '\n';
+                  } else {
+                    pollutantRegisterModel.carModel = int.parse(carModelController.text);
+                  }
+
+                  if (needTechnicalDiagnosis && hasTech && dateController.text.isEmpty)
+                    strErrors += 'تاریخ اخذ معاینه فنی وارد نشده است' + '\n';
+
+                  if (driverAddressController.text == "")
+                    strErrors += 'نشانی وارد نشده است' + '\n';
+                  else
+                    pollutantRegisterModel.driverAddress = driverAddressController.text;
+
+                  //convert File To base64 image string
+                  if (_base64Image == null) {
+                    strErrors += 'عکس گرفته نشده است' + '\n';
+                  } else {
+                    final bytes = await _base64Image!.readAsBytes();
+                    pollutantRegisterModel.photo = base64Encode(bytes);
+                  }
+                  if (engineTypeController.text == "0" ||
+                      fuelingTypeController.text == "0" ||
+                      carTypesController.text == "0" ||
+                      relationWithOwnerController.text == "0" ||
+                      analyzeMethodController.text == "0" ||
+                      (analyzeMethodController.text == "1" &&
+                          pollutantTypeController.text == "0") ||
+                      actionTypeController.text == "0" ||
+                      (actionTypeController.text == "2" &&
+                          recordedDocumentController.text == "0") ||
+                      (needTechnicalDiagnosis && hasTechnicalDiagnosisController.text == "0") ||
+                      (hasTech && technicalCentersController.text == "0") ||
+                      districtController.text == "0")
+                    strErrors += 'گزینه های انتخاب نشده را انتخاب کنید' + '\n';
+
+                  if (strErrors.length > 0) {
+                    ShowModal(title: 'خطا', content: strErrors).Message(context);
+                    return;
+                  }
+
+                  ///location checker and get lat lng
+                  Loading.open(context);
+                  var res = await Location().getCurrentLocation();
+                  Loading.close(context);
+                  if (res.statusCode != 0) {
+                    ShowModal(content: res.errors.toString(), title: 'خطا').Message(context);
+                    return;
+                  } else {
+                    var positionData = jsonDecode(res.data!);
+                    pollutantRegisterModel.lat = positionData['lat'];
+                    pollutantRegisterModel.lng = positionData['lng'];
+                  }
+
                   pollutantRegisterModel.pollutantsValue = [];
                   if (O2Controller.text.isNotEmpty)
                     pollutantRegisterModel.pollutantsValue.add(PollutantValue(
@@ -801,68 +881,6 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
                   if (KController.text.isNotEmpty)
                     pollutantRegisterModel.pollutantsValue.add(PollutantValue(
                         pollutant: CarsPollutants.K, value: double.parse(KController.text)));
-
-                  if (carModelController.text == "") {
-                    strErrors += 'مدل خودرو وارد نشده است' + '\n';
-                  } else {
-                    pollutantRegisterModel.carModel = int.parse(carModelController.text);
-                  }
-
-                  if (needTechnicalDiagnosis && hasTech && dateController.text.isEmpty)
-                    strErrors += 'تاریخ اخذ معاینه فنی وارد نشده است' + '\n';
-
-                  if (driverAddressController.text == "")
-                    strErrors += 'نشانی وارد نشده است' + '\n';
-                  else
-                    pollutantRegisterModel.driverAddress = driverAddressController.text;
-
-                  //convert File To base64 image string
-                  if (_base64Image == null) {
-                    strErrors += 'عکس گرفته نشده است' + '\n';
-                  } else {
-                    final bytes = await _base64Image!.readAsBytes();
-                    pollutantRegisterModel.photo = base64Encode(bytes);
-                  }
-
-                  if (engineTypeController.text == "0" ||
-                      fuelingTypeController.text == "0" ||
-                      carTypesController.text == "0" ||
-                      relationWithOwnerController.text == "0" ||
-                      analyzeMethodController.text == "0" ||
-                      (analyzeMethodController.text == "1" &&
-                          pollutantTypeController.text == "0") ||
-                      actionTypeController.text == "0" ||
-                      (actionTypeController.text == "2" &&
-                          recordedDocumentController.text == "0") ||
-                      (needTechnicalDiagnosis && hasTechnicalDiagnosisController.text == "0") ||
-                      (hasTech && technicalCentersController.text == "0") ||
-                      districtController.text == "0")
-                    strErrors += 'گزینه های انتخاب نشده را انتخاب کنید' + '\n';
-
-                  // print(pollutantRegisterModel.relationWithOwner.index.toString()+"=====================relationWithOwner.index");
-                  // print(relationWithOwnerController.text);
-                  // print(pollutantRegisterModel.carTypeId.toString()+"============================car type id");
-
-                  // var prefs = await SharedPreferences.getInstance();
-                  // var strOfficer = prefs.getString('officer');
-                  // var officer = jsonDecode(strOfficer!);
-                  // pollutantRegisterModel.officerId = int.parse(officer['id']);
-
-                  if (strErrors.length > 0) {
-                    ShowModal(title: 'خطا', content: strErrors).Message(context);
-                    return;
-                  }
-
-                  ///location checker and get lat lng
-                  var res = await Location().getCurrentLocation();
-                  if (res.statusCode != 0) {
-                    ShowModal(content: res.errors.toString(), title: 'خطا').Message(context);
-                    return;
-                  } else {
-                    var positionData = jsonDecode(res.data!);
-                    pollutantRegisterModel.lat = positionData['lat'];
-                    pollutantRegisterModel.lng = positionData['lng'];
-                  }
 
                   ShowModal(
                       title: 'اطلاعات زیر ثبت شود؟',
