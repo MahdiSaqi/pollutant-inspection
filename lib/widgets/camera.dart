@@ -2,11 +2,14 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as img;
+import 'package:pollutant_inspection/widgets/button_style.dart';
 
 class PictureForm extends StatefulWidget {
   final String labelText; // Optional label text for the picture field
   final Function(File?) onImageSelected; // Callback for base64 image
-  PictureForm({Key? key, this.labelText = 'Take a picture',required this.onImageSelected}) : super(key: key);
+  PictureForm({Key? key, this.labelText = 'Take a picture', required this.onImageSelected})
+      : super(key: key);
+
   @override
   _PictureFormState createState() => _PictureFormState();
 }
@@ -36,19 +39,18 @@ class _PictureFormState extends State<PictureForm> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        if (widget.labelText.isNotEmpty) Text(widget.labelText),
-        if (widget.labelText.isNotEmpty) SizedBox(width: 10.0),
-        ElevatedButton.icon(
-          onPressed: _pickImage,
-          icon: Icon(Icons.camera_alt),
-          label: Text('عکس گرفتن'),
-        ),
-        if (_imageFile != null)
-          SizedBox(width: 10.0),
+        // if (widget.labelText.isNotEmpty) Text(widget.labelText),
+        // if (widget.labelText.isNotEmpty) SizedBox(width: 10.0),
         if (_imageFile != null)
           Container(
-            height: 300.0,
-            width: 300.0,
+            // child: Text(
+            //   'تصویر مستند',
+            //   style: TextStyle(color: Colors.white),
+            // ),
+            // height: 300.0,
+            height: MediaQuery.of(context).size.height * 0.5,
+            width: MediaQuery.of(context).size.width * 0.75,
+            margin: EdgeInsets.all(10),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10.0),
               image: DecorationImage(
@@ -57,16 +59,17 @@ class _PictureFormState extends State<PictureForm> {
               ),
             ),
           ),
+        if (_imageFile != null) SizedBox(width: 100.0),
+        ElevatedButton.icon(
+          style: MyButtonStyle.style(context, Colors.blue),
+          onPressed: _pickImage,
+          icon: Icon(Icons.camera_alt),
+          label: Text('عکس گرفتن'),
+        ),
       ],
     );
   }
 }
-
-
-
-
-
-
 
 ///TODO write on image **********************************************
 // import 'dart:io';

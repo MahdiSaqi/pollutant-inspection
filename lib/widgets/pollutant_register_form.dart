@@ -14,12 +14,14 @@ import 'package:pollutant_inspection/enums/pollution_analyze_method.dart';
 import 'package:pollutant_inspection/enums/recorded_document.dart';
 import 'package:pollutant_inspection/enums/relation_with_owner.dart';
 import 'package:pollutant_inspection/models/SIMA_login_info.dart';
+import 'package:pollutant_inspection/models/constants.dart';
 import 'package:pollutant_inspection/models/pollutant_register_model.dart';
 import 'package:pollutant_inspection/server_utility/get_login_key.dart';
 import 'package:pollutant_inspection/server_utility/send_pollutant_information.dart';
 import 'package:pollutant_inspection/utility/get_current_location.dart';
 import 'package:pollutant_inspection/utility/loding.dart';
 import 'package:pollutant_inspection/utility/show_modal_error.dart';
+import 'package:pollutant_inspection/widgets/button_style.dart';
 import 'package:pollutant_inspection/widgets/camera.dart';
 import 'package:pollutant_inspection/widgets/dropdown_2.dart';
 import 'package:pollutant_inspection/widgets/dropdown_3.dart';
@@ -43,10 +45,10 @@ class PollutantRegisterForm extends StatefulWidget {
 }
 
 class PollutantRegisterFormState extends State<PollutantRegisterForm> {
+
+  // region definitions
   var pollutantRegisterModel = PollutantRegisterModel();
 
-  // SIMALoginInfo loginInfo;
-  // PollutantRegisterFormState(/*{required this.loginInfo}*/);
   static const String noneSelection = 'بدون انتخاب';
   String _selectedDate = Jalali.now().toJalaliDateTime();
   dartIO.File? _base64Image;
@@ -173,6 +175,7 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
       CO2Controller = TextEditingController(text: ""),
       OpacityController = TextEditingController(text: ""),
       KController = TextEditingController(text: "");
+  // endregion definitions
 
   @override
   void initState() {
@@ -321,7 +324,7 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
     _scrollController.jumpTo(0);
   }
 
-  void _clearPollutantValues(){
+  void _clearPollutantValues() {
     pollutantTypeController.text = "0";
     O2Controller.clear();
     LambdaController.clear();
@@ -332,6 +335,7 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
     OpacityController.clear();
     KController.clear();
   }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -730,233 +734,238 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
             controller: driverAddressController,
           ),
 
+
+          // if (_base64Image != null)
+          //   Container(
+          //     height: 300.0,
+          //     width: 300.0,
+          //     decoration: BoxDecoration(
+          //       borderRadius: BorderRadius.circular(10.0),
+          //       image: DecorationImage(
+          //         image: FileImage(_base64Image!),
+          //         fit: BoxFit.cover,
+          //       ),
+          //     ),
+          //   ),
+
           PictureForm(
-            labelText: 'تصویر مستند',
+            // labelText: 'تصویر مستند',
             onImageSelected: handleImageSelected,
           ),
-          if (_base64Image != null)
-            Container(
-              height: 300.0,
-              width: 300.0,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10.0),
-                image: DecorationImage(
-                  image: FileImage(_base64Image!),
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
 
           // DropDownField(),
           // DropDown2(),
           // DropdownEnum(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                ///دکمه صدور اخطار
-                onPressed: () async {
-                  String strErrors = "";
+          Container(
+            margin: EdgeInsets.all( MediaQuery.of(context).size.height * 0.03),
+            child: ElevatedButton.icon(
+              ///دکمه صدور اخطار
+              icon: Icon(Icons.car_crash),
 
-                  if (twoDigit.text.isEmpty ||
-                      threeDigit.text.isEmpty ||
-                      iranDigit.text.isEmpty ||
-                      letter.text == "-" ||
-                      twoDigit.text.length != 2 || // Check for 2 characters
-                      threeDigit.text.length != 3 || // Check for 3 characters
-                      iranDigit.text.length != 2 || // Check for 4 characters (Iranian format)
-                      letter.text.length != 1)
-                    strErrors += 'پلاک را به درستی وارد کنید' + '\n';
-                  else
-                    pollutantRegisterModel.carPlate =
-                        twoDigit.text + letter.text + threeDigit.text + iranDigit.text;
+              style: MyButtonStyle.style(context,Colors.red),
+              onPressed: () async {
+                String strErrors = "";
 
-                  if (nameController.text == "" || familyController.text == "")
-                    strErrors += 'نام یا نام خانوادگی راننده وارد نشده است' + '\n';
-                  else {
-                    pollutantRegisterModel.driverName = nameController.text;
-                    pollutantRegisterModel.driverFamily = familyController.text;
-                  }
+                if (twoDigit.text.isEmpty ||
+                    threeDigit.text.isEmpty ||
+                    iranDigit.text.isEmpty ||
+                    letter.text == "-" ||
+                    twoDigit.text.length != 2 || // Check for 2 characters
+                    threeDigit.text.length != 3 || // Check for 3 characters
+                    iranDigit.text.length != 2 || // Check for 4 characters (Iranian format)
+                    letter.text.length != 1)
+                  strErrors += 'پلاک را به درستی وارد کنید' + '\n';
+                else
+                  pollutantRegisterModel.carPlate =
+                      twoDigit.text + letter.text + threeDigit.text + iranDigit.text;
 
-                  if (driverNationalCodeController.text.length == 10)
-                    pollutantRegisterModel.driverNationalCode = driverNationalCodeController.text;
-                  else
-                    strErrors += 'کد ملی باید 10 رقم باشد' + '\n';
+                if (nameController.text == "" || familyController.text == "")
+                  strErrors += 'نام یا نام خانوادگی راننده وارد نشده است' + '\n';
+                else {
+                  pollutantRegisterModel.driverName = nameController.text;
+                  pollutantRegisterModel.driverFamily = familyController.text;
+                }
 
-                  if (driverMobileController.text.length == 11)
-                    pollutantRegisterModel.driverMobile = driverMobileController.text;
-                  else
-                    strErrors += 'تلفن همراه باید 11 رقم باشد' + '\n';
+                if (driverNationalCodeController.text.length == 10)
+                  pollutantRegisterModel.driverNationalCode = driverNationalCodeController.text;
+                else
+                  strErrors += 'کد ملی باید 10 رقم باشد' + '\n';
 
-                  if (analyzeMethodController.text == "2" &&
-                          (pollutantRegisterModel.engineType == 0 &&
-                              (O2Controller.text.isEmpty ||
-                                  LambdaController.text.isEmpty ||
-                                  COController.text.isEmpty ||
-                                  HCController.text.isEmpty ||
-                                  NOController.text.isEmpty ||
-                                  CO2Controller.text.isEmpty)) ||
-                      (pollutantRegisterModel.engineType == 1 &&
-                          (OpacityController.text.isEmpty || KController.text.isEmpty)))
-                    strErrors += 'مقادیر دستگاه آنالایزر وارد نشده است' + '\n';
+                if (driverMobileController.text.length == 11)
+                  pollutantRegisterModel.driverMobile = driverMobileController.text;
+                else
+                  strErrors += 'تلفن همراه باید 11 رقم باشد' + '\n';
 
-                  if (carModelController.text == "") {
-                    strErrors += 'مدل خودرو وارد نشده است' + '\n';
-                  } else {
-                    pollutantRegisterModel.carModel = int.parse(carModelController.text);
-                  }
+                if (analyzeMethodController.text == "2" &&
+                        (pollutantRegisterModel.engineType == 0 &&
+                            (O2Controller.text.isEmpty ||
+                                LambdaController.text.isEmpty ||
+                                COController.text.isEmpty ||
+                                HCController.text.isEmpty ||
+                                NOController.text.isEmpty ||
+                                CO2Controller.text.isEmpty)) ||
+                    (pollutantRegisterModel.engineType == 1 &&
+                        (OpacityController.text.isEmpty || KController.text.isEmpty)))
+                  strErrors += 'مقادیر دستگاه آنالایزر وارد نشده است' + '\n';
 
-                  if (needTechnicalDiagnosis && hasTech && dateController.text.isEmpty)
-                    strErrors += 'تاریخ اخذ معاینه فنی وارد نشده است' + '\n';
+                if (carModelController.text == "") {
+                  strErrors += 'مدل خودرو وارد نشده است' + '\n';
+                } else {
+                  pollutantRegisterModel.carModel = int.parse(carModelController.text);
+                }
 
-                  if (driverAddressController.text == "")
-                    strErrors += 'نشانی وارد نشده است' + '\n';
-                  else
-                    pollutantRegisterModel.driverAddress = driverAddressController.text;
+                if (needTechnicalDiagnosis && hasTech && dateController.text.isEmpty)
+                  strErrors += 'تاریخ اخذ معاینه فنی وارد نشده است' + '\n';
 
-                  //convert File To base64 image string
-                  if (_base64Image == null) {
-                    strErrors += 'عکس گرفته نشده است' + '\n';
-                  } else {
-                    final bytes = await _base64Image!.readAsBytes();
-                    pollutantRegisterModel.photo = base64Encode(bytes);
-                  }
-                  if (engineTypeController.text == "0" ||
-                      fuelingTypeController.text == "0" ||
-                      carTypesController.text == "0" ||
-                      relationWithOwnerController.text == "0" ||
-                      analyzeMethodController.text == "0" ||
-                      (analyzeMethodController.text == "1" &&
-                          pollutantTypeController.text == "0") ||
-                      actionTypeController.text == "0" ||
-                      (actionTypeController.text == "2" &&
-                          recordedDocumentController.text == "0") ||
-                      (needTechnicalDiagnosis && hasTechnicalDiagnosisController.text == "0") ||
-                      (hasTech && technicalCentersController.text == "0") ||
-                      districtController.text == "0")
-                    strErrors += 'گزینه های انتخاب نشده را انتخاب کنید' + '\n';
+                if (driverAddressController.text == "")
+                  strErrors += 'نشانی وارد نشده است' + '\n';
+                else
+                  pollutantRegisterModel.driverAddress = driverAddressController.text;
 
-                  if (strErrors.length > 0) {
-                    ShowModal(title: 'خطا', content: strErrors).Message(context);
-                    return;
-                  }
+                //convert File To base64 image string
+                if (_base64Image == null) {
+                  strErrors += 'عکس گرفته نشده است' + '\n';
+                } else {
+                  final bytes = await _base64Image!.readAsBytes();
+                  pollutantRegisterModel.photo = base64Encode(bytes);
+                }
+                if (engineTypeController.text == "0" ||
+                    fuelingTypeController.text == "0" ||
+                    carTypesController.text == "0" ||
+                    relationWithOwnerController.text == "0" ||
+                    analyzeMethodController.text == "0" ||
+                    (analyzeMethodController.text == "1" && pollutantTypeController.text == "0") ||
+                    actionTypeController.text == "0" ||
+                    (actionTypeController.text == "2" && recordedDocumentController.text == "0") ||
+                    (needTechnicalDiagnosis && hasTechnicalDiagnosisController.text == "0") ||
+                    (hasTech && technicalCentersController.text == "0") ||
+                    districtController.text == "0")
+                  strErrors += 'گزینه های انتخاب نشده را انتخاب کنید' + '\n';
 
-                  ///location checker and get lat lng
-                  Loading.open(context);
-                  var res = await Location().getCurrentLocation();
-                  Loading.close(context);
-                  if (res.statusCode != 0) {
-                    ShowModal(content: res.errors.toString(), title: 'خطا').Message(context);
-                    return;
-                  } else {
-                    var positionData = jsonDecode(res.data!);
-                    pollutantRegisterModel.lat = positionData['lat'];
-                    pollutantRegisterModel.lng = positionData['lng'];
-                  }
+                if (strErrors.length > 0) {
+                  ShowModal(title: 'خطا', content: strErrors).Message(context);
+                  return;
+                }
 
-                  pollutantRegisterModel.pollutantsValue = [];
-                  if (O2Controller.text.isNotEmpty)
-                    pollutantRegisterModel.pollutantsValue.add(PollutantValue(
-                        pollutant: CarsPollutants.O2, value: double.parse(O2Controller.text)));
-                  if (LambdaController.text.isNotEmpty)
-                    pollutantRegisterModel.pollutantsValue.add(PollutantValue(
-                        pollutant: CarsPollutants.Lambda,
-                        value: double.parse(LambdaController.text)));
-                  if (COController.text.isNotEmpty)
-                    pollutantRegisterModel.pollutantsValue.add(PollutantValue(
-                        pollutant: CarsPollutants.CO, value: double.parse(COController.text)));
-                  if (HCController.text.isNotEmpty)
-                    pollutantRegisterModel.pollutantsValue.add(PollutantValue(
-                        pollutant: CarsPollutants.HC, value: double.parse(HCController.text)));
-                  if (NOController.text.isNotEmpty)
-                    pollutantRegisterModel.pollutantsValue.add(PollutantValue(
-                        pollutant: CarsPollutants.NO, value: double.parse(NOController.text)));
-                  if (CO2Controller.text.isNotEmpty)
-                    pollutantRegisterModel.pollutantsValue.add(PollutantValue(
-                        pollutant: CarsPollutants.CO2, value: double.parse(CO2Controller.text)));
-                  if (OpacityController.text.isNotEmpty)
-                    pollutantRegisterModel.pollutantsValue.add(PollutantValue(
-                        pollutant: CarsPollutants.Opacity,
-                        value: double.parse(OpacityController.text)));
-                  if (KController.text.isNotEmpty)
-                    pollutantRegisterModel.pollutantsValue.add(PollutantValue(
-                        pollutant: CarsPollutants.K, value: double.parse(KController.text)));
+                ///location checker and get lat lng
+                Loading.open(context);
+                var res = await Location().getCurrentLocation();
+                Loading.close(context);
+                if (res.statusCode != 0) {
+                  ShowModal(content: res.errors.toString(), title: 'خطا').Message(context);
+                  return;
+                } else {
+                  var positionData = jsonDecode(res.data!);
+                  pollutantRegisterModel.lat = positionData['lat'];
+                  pollutantRegisterModel.lng = positionData['lng'];
+                }
 
-                  ShowModal(
-                      title: 'اطلاعات زیر ثبت شود؟',
-                      content: "شماره پلاک: " +
-                          pollutantRegisterModel.carPlate
-                              .substring(0, pollutantRegisterModel.carPlate.length - 2) +
-                          "ایران" +
-                          pollutantRegisterModel.carPlate
-                              .substring(pollutantRegisterModel.carPlate.length - 2) +
-                          "\n" +
-                          "شماره همراه: " +
-                          pollutantRegisterModel.driverMobile,
-                      onOkPressed: () async {
-                        try {
-                          Navigator.pop(context);
-                          Loading.open(context);
-                          var res = await PollutantInformation().send(pollutantRegisterModel);
-                          Loading.close(context);
+                pollutantRegisterModel.pollutantsValue = [];
+                if (O2Controller.text.isNotEmpty)
+                  pollutantRegisterModel.pollutantsValue.add(PollutantValue(
+                      pollutant: CarsPollutants.O2, value: double.parse(O2Controller.text)));
+                if (LambdaController.text.isNotEmpty)
+                  pollutantRegisterModel.pollutantsValue.add(PollutantValue(
+                      pollutant: CarsPollutants.Lambda, value: double.parse(LambdaController.text)));
+                if (COController.text.isNotEmpty)
+                  pollutantRegisterModel.pollutantsValue.add(PollutantValue(
+                      pollutant: CarsPollutants.CO, value: double.parse(COController.text)));
+                if (HCController.text.isNotEmpty)
+                  pollutantRegisterModel.pollutantsValue.add(PollutantValue(
+                      pollutant: CarsPollutants.HC, value: double.parse(HCController.text)));
+                if (NOController.text.isNotEmpty)
+                  pollutantRegisterModel.pollutantsValue.add(PollutantValue(
+                      pollutant: CarsPollutants.NO, value: double.parse(NOController.text)));
+                if (CO2Controller.text.isNotEmpty)
+                  pollutantRegisterModel.pollutantsValue.add(PollutantValue(
+                      pollutant: CarsPollutants.CO2, value: double.parse(CO2Controller.text)));
+                if (OpacityController.text.isNotEmpty)
+                  pollutantRegisterModel.pollutantsValue.add(PollutantValue(
+                      pollutant: CarsPollutants.Opacity,
+                      value: double.parse(OpacityController.text)));
+                if (KController.text.isNotEmpty)
+                  pollutantRegisterModel.pollutantsValue.add(PollutantValue(
+                      pollutant: CarsPollutants.K, value: double.parse(KController.text)));
 
-                          if (res.statusCode == 0) {
-                            ShowModal(title: 'ثبت شد', content: 'اخطار با موفقیت صادر شد')
-                                .Message(context);
-                            _clearForm();
-                          } else
-                            ShowModal(
-                                    title: res.statusCode.toString(),
-                                    content: res.errors.toString())
-                                .Message(context);
-                          // if (res != null && res.statusCode == 200) {
-                          //   var jsonRes = jsonDecode(res.body);
-                          //   if (jsonRes['statusCode'] == 0) {
-                          //     //TODO print
-                          //     print(jsonRes['body']);
-                          //     ShowModal(title: 'ثبت شد', content: 'اخطار با موفقیت صادر شد.')
-                          //         .Message(context);
-                          //     _clearForm();
-                          //   } else {
-                          //     print(jsonRes);
-                          //     print(jsonRes['errors']);
-                          //     ShowModal(
-                          //       content: 'لطفا موارد زیر را رعایت کنید',
-                          //       title: jsonRes['errors'].toString(),
-                          //     ).Message(context);
-                          //   }
-                          // } else {
-                          //   ShowModal(title: 'خطای ارتباطی', content: res!.statusCode.toString())
-                          //       .Message(context);
-                          // }
-                        } catch (e) {
-                          ShowModal(
-                            content: 'خطا',
-                            title: e.toString(),
-                          ).Message(context);
-                        }
-                      }).Message(context);
-                },
+                ShowModal(
+                    title: 'اطلاعات زیر ثبت شود؟',
+                    content: "شماره پلاک: " +
+                        pollutantRegisterModel.carPlate
+                            .substring(0, pollutantRegisterModel.carPlate.length - 2) +
+                        "ایران" +
+                        pollutantRegisterModel.carPlate
+                            .substring(pollutantRegisterModel.carPlate.length - 2) +
+                        "\n" +
+                        "شماره همراه: " +
+                        pollutantRegisterModel.driverMobile,
+                    onOkPressed: () async {
+                      try {
+                        Navigator.pop(context);
+                        Loading.open(context);
+                        var res = await PollutantInformation().send(pollutantRegisterModel);
+                        Loading.close(context);
 
-                ///on pressed
-                child: Row(
-                  children: [Text("   صدور اخطار  "), Icon(Icons.save)],
-                ),
-              ),
-              SizedBox(
-                width: 40,
-              ),
-              ElevatedButton(
-                  style: ButtonStyle(
-                      backgroundColor: MaterialStatePropertyAll(Colors.red),
-                      foregroundColor: MaterialStatePropertyAll(Colors.white)),
-                  onPressed: () {
+                        if (res.statusCode == 0) {
+                          ShowModal(title: 'ثبت شد', content: 'اخطار با موفقیت صادر شد')
+                              .Message(context);
+                          _clearForm();
+                        } else
+                          ShowModal(title: res.statusCode.toString(), content: res.errors.toString())
+                              .Message(context);
+                        // if (res != null && res.statusCode == 200) {
+                        //   var jsonRes = jsonDecode(res.body);
+                        //   if (jsonRes['statusCode'] == 0) {
+                        //     //TODO print
+                        //     print(jsonRes['body']);
+                        //     ShowModal(title: 'ثبت شد', content: 'اخطار با موفقیت صادر شد.')
+                        //         .Message(context);
+                        //     _clearForm();
+                        //   } else {
+                        //     print(jsonRes);
+                        //     print(jsonRes['errors']);
+                        //     ShowModal(
+                        //       content: 'لطفا موارد زیر را رعایت کنید',
+                        //       title: jsonRes['errors'].toString(),
+                        //     ).Message(context);
+                        //   }
+                        // } else {
+                        //   ShowModal(title: 'خطای ارتباطی', content: res!.statusCode.toString())
+                        //       .Message(context);
+                        // }
+                      } catch (e) {
+                        ShowModal(
+                          content: 'خطا',
+                          title: e.toString(),
+                        ).Message(context);
+                      }
+                    }).Message(context);
+              },
+
+              ///on pressed
+              label: Text("   صدور اخطار  "),
+            ),
+          ),
+          // SizedBox(
+          //   width: 40,
+          // ),
+          ElevatedButton.icon(
+            style: MyButtonStyle.style(context,Colors.blueGrey),
+            // style: ButtonStyle(
+            //     backgroundColor: MaterialStatePropertyAll(Colors.red),
+            //     foregroundColor: MaterialStatePropertyAll(Colors.white),
+            //     fixedSize: MaterialStateProperty.all(Size(50, 50))),
+
+            onPressed: () {
+              ShowModal(
+                  title: Constants.clearForm,
+                  content: 'از پاک کردن فرم اطمینان دارید؟',
+                  onOkPressed: () {
                     _clearForm();
-                  },
-                  child: Row(
-                    children: [Text('بازنشانی'), Icon(Icons.clear)],
-                  )),
-            ],
+                    Navigator.pop(context);
+                  }).Message(context);
+            },
+            label: Text(Constants.clearForm),
+            icon: Icon(Icons.clear),
           ),
           SizedBox(
             height: 50,

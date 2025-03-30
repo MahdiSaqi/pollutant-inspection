@@ -33,4 +33,8 @@ class Constants {
       "api/SIMA/Notice/Register"; //"api/SIMA/Notice/Register";
 
   static const int requestTimeOutSecond = 60;
+
+
+  ///labels
+  static const String clearForm='پاک کردن فرم';
 }

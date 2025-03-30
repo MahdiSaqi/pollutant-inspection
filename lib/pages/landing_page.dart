@@ -117,6 +117,7 @@ import 'package:pollutant_inspection/pages/daily_report.dart';
 import 'package:pollutant_inspection/pages/pollutant_register.dart';
 import 'package:pollutant_inspection/utility/get_current_location.dart';
 import 'package:pollutant_inspection/utility/show_modal_error.dart';
+import 'package:pollutant_inspection/widgets/button_style.dart';
 import 'package:pollutant_inspection/widgets/logined_user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -157,8 +158,9 @@ class _LandingPageState extends State<LandingPage> {
                     SizedBox(
                       height: 20,
                     ),
-                    ElevatedButton(
-
+                    ElevatedButton.icon(
+                        style: MyButtonStyle.style(context,Colors.red),
+                        icon: Icon(Icons.warning_amber),
                         ///'صدور اخطار خودروی آلاینده'
                         onPressed: () async {
                           try {
@@ -173,12 +175,11 @@ class _LandingPageState extends State<LandingPage> {
                                   prefs?.setString('baseDefinitions', myRes.data!);
                                   Navigator.push(context,
                                       MaterialPageRoute(builder: (context) => PollutantRegister()));
-                                }else{
+                                } else {
                                   ShowModal(
                                     content: 'شیفت کاری شما فعال نمی باشد',
                                     title: 'خطا',
                                   ).Message(context);
-
                                 }
                               } else {
                                 ShowModal(
@@ -189,20 +190,22 @@ class _LandingPageState extends State<LandingPage> {
                             }
                           } catch (e) {}
                         },
-                        child: Text(
+                        label: Text(
                           'صدور اخطار خودروی آلاینده',
                           style: TextStyle(
                             fontSize: 16,
                           ),
                         )),
                     Container(
-                      margin: EdgeInsets.all(20),
-                      child: ElevatedButton(
+                      margin: EdgeInsets.all( MediaQuery.of(context).size.height * 0.03),
+                      child: ElevatedButton.icon(
+                        style: MyButtonStyle.style(context,Colors.blue),
+                        icon: Icon(Icons.newspaper),
                         onPressed: () {
                           Navigator.push(
                               context, MaterialPageRoute(builder: (context) => DailyReport()));
                         },
-                        child: Text(
+                        label: Text(
                           'گزارش عملیات',
                           style: TextStyle(
                             fontSize: 16,
@@ -210,7 +213,9 @@ class _LandingPageState extends State<LandingPage> {
                         ),
                       ),
                     ),
-                    ElevatedButton(
+                    ElevatedButton.icon(
+                      style: MyButtonStyle.style(context,Colors.blueGrey),
+                      icon: Icon(Icons.logout),
                       onPressed: () async {
                         ShowModal(
                             title: 'برگشت به صفحه ورود',
@@ -222,11 +227,11 @@ class _LandingPageState extends State<LandingPage> {
                                 MaterialPageRoute(
                                     builder: (context) => MyHomePage(title: Constants.appTitle)),
                                 // Replace with your actual login screen widget
-                                (route) => false, // Remove all previous routes
+                                    (route) => false, // Remove all previous routes
                               );
                             }).Message(context);
                       },
-                      child: Text(
+                      label: Text(
                         'خروج از حساب کاربری',
                         style: TextStyle(
                           fontSize: 16,
@@ -234,8 +239,10 @@ class _LandingPageState extends State<LandingPage> {
                       ),
                     ),
                     //GetCurrentLocation(),///for test
-                    SizedBox(height: 250,),
-                    Text( 'طراحی توسط فتاپ نسخه 1')
+                    SizedBox(
+                      height:  MediaQuery.of(context).size.height * 0.3,
+                    ),
+                    Text('طراحی و توسعه توسط فتاپ نسخه 1.0')
                   ],
                 ),
               ],

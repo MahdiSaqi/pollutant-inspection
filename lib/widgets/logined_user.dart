@@ -36,11 +36,17 @@ class _LoginedUserState extends State<LoginedUser> {
 
   @override
   Widget build(BuildContext context) {
-    return Text("کاربر جاری: " + userName,
-      textDirection: TextDirection.rtl,
-      textAlign: TextAlign.right,
-      style: TextStyle(
-        fontSize: 16,
-      ),);
+    return Container(
+      padding: EdgeInsets.all(10.0),
+      width: MediaQuery.of(context).size.width,
+      color: Color.fromARGB(100, 0, 255, 0),
+      child: Text("کاربر : " + userName,
+        textDirection: TextDirection.rtl,
+        textAlign: TextAlign.right,
+        style: TextStyle(
+          // color: Colors.deepPurple,
+          fontSize: 16,
+        ),),
+    );
   }
 }
