@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 
 import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 import 'package:pollutant_inspection/enums/cars_pollutants.dart';
@@ -48,7 +49,7 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
 
   // region definitions
   var pollutantRegisterModel = PollutantRegisterModel();
-
+  FocusNode nameFieldFocus=FocusNode(),familyFieldFocus=FocusNode();
   static const String noneSelection = 'بدون انتخاب';
   String _selectedDate = Jalali.now().toJalaliDateTime();
   dartIO.File? _base64Image;
@@ -322,6 +323,7 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
     pollutantRegisterModel = PollutantRegisterModel();
     pollutantRegisterModel.officerId = tempOfficerID;
     _scrollController.jumpTo(0);
+    // FocusScope.of(context).requestFocus(nameFieldFocus);
   }
 
   void _clearPollutantValues() {
@@ -489,11 +491,14 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
           ),
 
           MyFormField(
+            selfFocusName: nameFieldFocus,
+            nextFocusName: familyFieldFocus,
             labelText: 'نام راننده',
             controller: nameController,
           ),
 
           MyFormField(
+            selfFocusName: familyFieldFocus,
             labelText: 'نام خانوادگی راننده',
             controller: familyController,
           ),

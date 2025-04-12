@@ -39,7 +39,7 @@ class _LoginedUserState extends State<LoginedUser> {
     return Container(
       padding: EdgeInsets.all(10.0),
       width: MediaQuery.of(context).size.width,
-      color: Color.fromARGB(100, 0, 255, 0),
+      color: Color.fromARGB(20, 0, 255, 0),
       child: Text("کاربر : " + userName,
         textDirection: TextDirection.rtl,
         textAlign: TextAlign.right,

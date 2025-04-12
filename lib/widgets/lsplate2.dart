@@ -101,6 +101,7 @@ class _LSPlateState extends State<LSPlate> {
                             widget.letter.text = alphabet;
                           });
                           Navigator.of(context).pop();
+                          FocusScope.of(context).requestFocus(threeDigitFocus);
                         },
                         child: Card(
                           margin: EdgeInsets.all(8.0),
@@ -201,6 +202,7 @@ class _LSPlateState extends State<LSPlate> {
                               controller: widget.letter,
                               onTap: () async {
                                 await showLetterPlate();
+
                               },
                             ),
                           ),
@@ -255,6 +257,7 @@ class _LSPlateState extends State<LSPlate> {
     required Function() onTap,
     TextInputType keyboardType = TextInputType.number}) {
     return TextFormField(
+      focusNode: node,
       onTap: onTap,
       controller: controller,
       cursorColor: Colors.black,
@@ -272,17 +275,12 @@ class _LSPlateState extends State<LSPlate> {
       keyboardType: keyboardType,
       textInputAction: TextInputAction.next,
       autofocus: autoFocus,
-
       onChanged: (value) {
-        if (value.length == maxLength) {
-          if (node == twoDigitFocus) {
+        // if (value.length == maxLength) {
+          if (node == twoDigitFocus && value.length == maxLength) {
             showLetterPlate();
           }
-          // FocusScope.of(context).nextFocus();
-
-          // GestureDetector? detector =
-          //     _dropdownKey.currentContext?.findAncestorWidgetOfExactType<GestureDetector>();
-        }
+        // }
       },
 
       //    onEditingComplete: () => FocusScope.of(context).nextFocus(),
