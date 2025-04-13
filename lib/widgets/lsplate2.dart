@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:pollutant_inspection/utility/loding.dart';
 
 import 'form_field.dart';
 
@@ -12,6 +13,7 @@ class LSPlate extends StatefulWidget {
   final TextEditingController iranDigit;
   final Color color;
   final bool enable;
+  final Function() searchFunction;
 
 //
   LSPlate({required this.twoDigit,
@@ -19,6 +21,7 @@ class LSPlate extends StatefulWidget {
     required this.threeDigit,
     required this.iranDigit,
     required this.color,
+    required this.searchFunction(),
     this.enable = true});
 
   @override
@@ -232,7 +235,7 @@ class _LSPlateState extends State<LSPlate> {
                     width: 45,
                     child: plateText(
                       ///--------------------------------------------------------------iran digit
-                      onTap: () {},
+                      onTap: (){},
                       controller: widget.iranDigit,
                       maxLength: 2,
                       node: iranDigitFocus,
@@ -279,6 +282,11 @@ class _LSPlateState extends State<LSPlate> {
         // if (value.length == maxLength) {
           if (node == twoDigitFocus && value.length == maxLength) {
             showLetterPlate();
+          }
+          if(node == iranDigitFocus && value.length == maxLength){
+            Loading.open(context);
+            widget.searchFunction();
+            Loading.close(context);
           }
         // }
       },

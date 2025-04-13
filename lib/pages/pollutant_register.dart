@@ -20,9 +20,9 @@ class PollutantRegister extends StatelessWidget {
         ShowModal(
             title: 'برگشت به صفحه اصلی',
             content: 'از برگشت به صفحه اصلی اطمینان دارید',
-            onOkPressed: () {
+            okButton: () {
               Navigator.pop(context);
-              Navigator.pop(context);
+              Navigator.of(context).pop();
             }).Message(context);
       },
       child: Scaffold(

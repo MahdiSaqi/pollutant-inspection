@@ -10,12 +10,14 @@ class PictureForm extends StatefulWidget {
   PictureForm({Key? key, this.labelText = 'Take a picture', required this.onImageSelected})
       : super(key: key);
 
+
   @override
   _PictureFormState createState() => _PictureFormState();
 }
 
 class _PictureFormState extends State<PictureForm> {
   File? _imageFile;
+
 
   Future<void> _pickImage() async {
     final XFile? pickedImage = await ImagePicker().pickImage(source: ImageSource.camera);
@@ -27,12 +29,13 @@ class _PictureFormState extends State<PictureForm> {
       if (pickedImage != null) {
         _imageFile = File(pickedImage.path);
         // _imageFile = File(newImage as String);
+        widget.onImageSelected(_imageFile);
       }
     });
     // final bytes = await _imageFile!.readAsBytes();
     // final imageData = base64Encode(bytes);
     // widget.onImageSelected(imageData); // Call callback with base64 data
-    widget.onImageSelected(_imageFile);
+
   }
 
   @override
@@ -41,25 +44,25 @@ class _PictureFormState extends State<PictureForm> {
       children: [
         // if (widget.labelText.isNotEmpty) Text(widget.labelText),
         // if (widget.labelText.isNotEmpty) SizedBox(width: 10.0),
-        if (_imageFile != null)
-          Container(
-            // child: Text(
-            //   'تصویر مستند',
-            //   style: TextStyle(color: Colors.white),
-            // ),
-            // height: 300.0,
-            height: MediaQuery.of(context).size.height * 0.5,
-            width: MediaQuery.of(context).size.width * 0.75,
-            margin: EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10.0),
-              image: DecorationImage(
-                image: FileImage(_imageFile!),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-        if (_imageFile != null) SizedBox(width: 100.0),
+        // if (_imageFile != null)
+        //   Container(
+        //     // child: Text(
+        //     //   'تصویر مستند',
+        //     //   style: TextStyle(color: Colors.white),
+        //     // ),
+        //     // height: 300.0,
+        //     height: MediaQuery.of(context).size.height * 0.5,
+        //     width: MediaQuery.of(context).size.width * 0.75,
+        //     margin: EdgeInsets.all(10),
+        //     decoration: BoxDecoration(
+        //       borderRadius: BorderRadius.circular(10.0),
+        //       image: DecorationImage(
+        //         image: FileImage(_imageFile!),
+        //         fit: BoxFit.cover,
+        //       ),
+        //     ),
+        //   ),
+        // if (_imageFile != null) SizedBox(width: 100.0),
         ElevatedButton.icon(
           style: MyButtonStyle.style(context, Colors.blue),
           onPressed: _pickImage,

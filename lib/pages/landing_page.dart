@@ -220,7 +220,7 @@ class _LandingPageState extends State<LandingPage> {
                         ShowModal(
                             title: 'برگشت به صفحه ورود',
                             content: 'از برگشت به صفحه ورود اطمینان دارید',
-                            onOkPressed: () async {
+                            okButton: () async {
                               var prefs = await SharedPreferences.getInstance();
                               await prefs.clear();
                               Navigator.of(context).pushAndRemoveUntil(

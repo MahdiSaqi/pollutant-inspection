@@ -46,10 +46,9 @@ class PollutantRegisterForm extends StatefulWidget {
 }
 
 class PollutantRegisterFormState extends State<PollutantRegisterForm> {
-
   // region definitions
   var pollutantRegisterModel = PollutantRegisterModel();
-  FocusNode nameFieldFocus=FocusNode(),familyFieldFocus=FocusNode();
+  FocusNode nameFieldFocus = FocusNode(), familyFieldFocus = FocusNode();
   static const String noneSelection = 'بدون انتخاب';
   String _selectedDate = Jalali.now().toJalaliDateTime();
   dartIO.File? _base64Image;
@@ -176,6 +175,7 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
       CO2Controller = TextEditingController(text: ""),
       OpacityController = TextEditingController(text: ""),
       KController = TextEditingController(text: "");
+
   // endregion definitions
 
   @override
@@ -239,13 +239,13 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
 
   bool isCorrectPlate() {
     if (twoDigit.text.isEmpty ||
-        threeDigit.text.isEmpty ||
-        iranDigit.text.isEmpty ||
-        letter.text == "-" ||
-        twoDigit.text.length != 2 || // Check for 2 characters
-        threeDigit.text.length != 3 || // Check for 3 characters
-        iranDigit.text.length != 2 || // Check for 4 characters (Iranian format)
-        letter.text.length != 1) {
+            threeDigit.text.isEmpty ||
+            iranDigit.text.isEmpty ||
+            letter.text == "-" ||
+            twoDigit.text.length != 2 || // Check for 2 characters
+            threeDigit.text.length != 3 || // Check for 3 characters
+            iranDigit.text.length != 2 // Check for 4 characters (Iranian format)
+        ) {
       return false;
     } else
       return true;
@@ -324,6 +324,7 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
     pollutantRegisterModel.officerId = tempOfficerID;
     _scrollController.jumpTo(0);
     // FocusScope.of(context).requestFocus(nameFieldFocus);
+
   }
 
   void _clearPollutantValues() {
@@ -336,6 +337,31 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
     CO2Controller.clear();
     OpacityController.clear();
     KController.clear();
+  }
+
+  Future<void> _searchFunction() async {
+    if (!isCorrectPlate()) {
+      ShowModal(title: 'لطفا موارد زیر را رعایت کنید', content: 'پلاک را به درستی وارد کنید')
+          .Message(context);
+      return;
+    }
+    var prefs = await SharedPreferences.getInstance();
+    String? strLoginInfo = prefs?.getString('loginInfo');
+    if (strLoginInfo != null) {
+      var loginInfo = jsonDecode(strLoginInfo);
+      var myRes = await GetPlateSearch().getData(
+          loginInfo['token'], twoDigit.text + letter.text + threeDigit.text + iranDigit.text);
+      if (myRes.statusCode == 0) {
+        setState(() {
+          _fillForm(jsonDecode(myRes.data!));
+        });
+      } else {
+        ShowModal(
+          content: myRes.errors.toString(),
+          title: myRes.statusCode.toString(),
+        ).Message(context);
+      }
+    }
   }
 
   @override
@@ -361,11 +387,13 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
           // ),
           Text("افسر شیفت : " + officerName),
           LSPlate(
-              twoDigit: twoDigit,
-              letter: letter,
-              threeDigit: threeDigit,
-              iranDigit: iranDigit,
-              color: Colors.white),
+            twoDigit: twoDigit,
+            letter: letter,
+            threeDigit: threeDigit,
+            iranDigit: iranDigit,
+            color: Colors.white,
+            searchFunction: _searchFunction,
+          ),
           ElevatedButton(
               onPressed: () async {
                 if (!isCorrectPlate()) {
@@ -740,19 +768,25 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
           ),
 
 
-          // if (_base64Image != null)
-          //   Container(
-          //     height: 300.0,
-          //     width: 300.0,
-          //     decoration: BoxDecoration(
-          //       borderRadius: BorderRadius.circular(10.0),
-          //       image: DecorationImage(
-          //         image: FileImage(_base64Image!),
-          //         fit: BoxFit.cover,
-          //       ),
-          //     ),
-          //   ),
-
+          if (_base64Image != null)
+            Container(
+              // child: Text(
+              //   'تصویر مستند',
+              //   style: TextStyle(color: Colors.white),
+              // ),
+              // height: 300.0,
+              height: MediaQuery.of(context).size.height * 0.5,
+              width: MediaQuery.of(context).size.width * 0.75,
+              margin: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10.0),
+                image: DecorationImage(
+                  image: FileImage(_base64Image!),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          if (_base64Image != null) SizedBox(width: 100.0),
           PictureForm(
             // labelText: 'تصویر مستند',
             onImageSelected: handleImageSelected,
@@ -762,27 +796,20 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
           // DropDown2(),
           // DropdownEnum(),
           Container(
-            margin: EdgeInsets.all( MediaQuery.of(context).size.height * 0.03),
+            margin: EdgeInsets.all(MediaQuery.of(context).size.height * 0.03),
             child: ElevatedButton.icon(
               ///دکمه صدور اخطار
               icon: Icon(Icons.car_crash),
 
-              style: MyButtonStyle.style(context,Colors.red),
+              style: MyButtonStyle.style(context, Colors.red),
               onPressed: () async {
                 String strErrors = "";
 
-                if (twoDigit.text.isEmpty ||
-                    threeDigit.text.isEmpty ||
-                    iranDigit.text.isEmpty ||
-                    letter.text == "-" ||
-                    twoDigit.text.length != 2 || // Check for 2 characters
-                    threeDigit.text.length != 3 || // Check for 3 characters
-                    iranDigit.text.length != 2 || // Check for 4 characters (Iranian format)
-                    letter.text.length != 1)
-                  strErrors += 'پلاک را به درستی وارد کنید' + '\n';
-                else
+                if (isCorrectPlate())
                   pollutantRegisterModel.carPlate =
                       twoDigit.text + letter.text + threeDigit.text + iranDigit.text;
+                else
+                  strErrors += 'پلاک را به درستی وارد کنید' + '\n';
 
                 if (nameController.text == "" || familyController.text == "")
                   strErrors += 'نام یا نام خانوادگی راننده وارد نشده است' + '\n';
@@ -871,7 +898,8 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
                       pollutant: CarsPollutants.O2, value: double.parse(O2Controller.text)));
                 if (LambdaController.text.isNotEmpty)
                   pollutantRegisterModel.pollutantsValue.add(PollutantValue(
-                      pollutant: CarsPollutants.Lambda, value: double.parse(LambdaController.text)));
+                      pollutant: CarsPollutants.Lambda,
+                      value: double.parse(LambdaController.text)));
                 if (COController.text.isNotEmpty)
                   pollutantRegisterModel.pollutantsValue.add(PollutantValue(
                       pollutant: CarsPollutants.CO, value: double.parse(COController.text)));
@@ -903,7 +931,7 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
                         "\n" +
                         "شماره همراه: " +
                         pollutantRegisterModel.driverMobile,
-                    onOkPressed: () async {
+                    okButton: () async {
                       try {
                         Navigator.pop(context);
                         Loading.open(context);
@@ -915,7 +943,8 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
                               .Message(context);
                           _clearForm();
                         } else
-                          ShowModal(title: res.statusCode.toString(), content: res.errors.toString())
+                          ShowModal(
+                                  title: res.statusCode.toString(), content: res.errors.toString())
                               .Message(context);
                         // if (res != null && res.statusCode == 200) {
                         //   var jsonRes = jsonDecode(res.body);
@@ -954,7 +983,7 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
           //   width: 40,
           // ),
           ElevatedButton.icon(
-            style: MyButtonStyle.style(context,Colors.blueGrey),
+            style: MyButtonStyle.style(context, Colors.blueGrey),
             // style: ButtonStyle(
             //     backgroundColor: MaterialStatePropertyAll(Colors.red),
             //     foregroundColor: MaterialStatePropertyAll(Colors.white),
@@ -964,7 +993,7 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
               ShowModal(
                   title: Constants.clearForm,
                   content: 'از پاک کردن فرم اطمینان دارید؟',
-                  onOkPressed: () {
+                  okButton: () {
                     _clearForm();
                     Navigator.pop(context);
                   }).Message(context);
