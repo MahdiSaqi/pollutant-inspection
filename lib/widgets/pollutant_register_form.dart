@@ -252,7 +252,6 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
   }
 
   void _fillForm(Map<String, dynamic> res) {
-    print(res['notice']['id']);
     if (!res['registerIsValid']) {
       ShowModal(title: 'خطا', content: 'این پلاک اخیرا ثبت شده است و امکان ثبت وجود ندارد')
           .Message(context);
@@ -261,29 +260,23 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
     pollutantRegisterModel = PollutantRegisterModel.fromJson(res['notice']);
 
     setState(() {
-      engineTypeController.text = "0";
-      pollutantRegisterModel.engineType.toString();
-      // fuelingTypeController.text = "0";
-      carTypesController.text = "1"; //pollutantRegisterModel.carTypeId.toString();
+      engineTypeController.text = (pollutantRegisterModel.engineType + 1).toString();
+      fuelingTypeController.text = (pollutantRegisterModel.fuelType + 1).toString();
+      DualSelected = pollutantRegisterModel.isDual;
+
+      // var z=res['notice']['carTypeId'];
+      // var x = petrolCarTypes
+      //     .where((element) => element.id == pollutantRegisterModel.carTypeId.toString());
+      // var y = gasolineCarTypes
+      //     .where((element) => element.id == pollutantRegisterModel.carTypeId.toString());
+      // carTypesController.text=(x+1).toString();
+
       carModelController.text = pollutantRegisterModel.carModel.toString();
       nameController.text = pollutantRegisterModel.driverName;
       familyController.text = pollutantRegisterModel.driverFamily;
       driverNationalCodeController.text = pollutantRegisterModel.driverNationalCode;
-      // relationWithOwnerController.text = "0";
       driverMobileController.text = pollutantRegisterModel.driverMobile;
-      // analyzeMethodController.text = "0";
-
-      // recordedDocumentController.text = "0";
-      // hasTech = false;
-
-      // hasTechnicalDiagnosisController.text = "0";
-
-      // technicalCentersController.text = "0";
-
-      // districtController.text = "0";
-      // driverAddressController.clear();
-
-      // hasAnalyzer = false;
+      driverAddressController.text = pollutantRegisterModel.driverAddress;
     });
   }
 
@@ -324,7 +317,6 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
     pollutantRegisterModel.officerId = tempOfficerID;
     _scrollController.jumpTo(0);
     // FocusScope.of(context).requestFocus(nameFieldFocus);
-
   }
 
   void _clearPollutantValues() {
@@ -396,30 +388,31 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
           ),
           ElevatedButton(
               onPressed: () async {
-                if (!isCorrectPlate()) {
-                  ShowModal(
-                          title: 'لطفا موارد زیر را رعایت کنید',
-                          content: 'پلاک را به درستی وارد کنید')
-                      .Message(context);
-                  return;
-                }
-                var prefs = await SharedPreferences.getInstance();
-                String? strLoginInfo = prefs?.getString('loginInfo');
-                if (strLoginInfo != null) {
-                  var loginInfo = jsonDecode(strLoginInfo);
-                  var myRes = await GetPlateSearch().getData(loginInfo['token'],
-                      twoDigit.text + letter.text + threeDigit.text + iranDigit.text);
-                  if (myRes.statusCode == 0) {
-                    setState(() {
-                      _fillForm(jsonDecode(myRes.data!));
-                    });
-                  } else {
-                    ShowModal(
-                      content: myRes.errors.toString(),
-                      title: myRes.statusCode.toString(),
-                    ).Message(context);
-                  }
-                }
+                _searchFunction();
+                // if (!isCorrectPlate()) {
+                //   ShowModal(
+                //           title: 'لطفا موارد زیر را رعایت کنید',
+                //           content: 'پلاک را به درستی وارد کنید')
+                //       .Message(context);
+                //   return;
+                // }
+                // var prefs = await SharedPreferences.getInstance();
+                // String? strLoginInfo = prefs?.getString('loginInfo');
+                // if (strLoginInfo != null) {
+                //   var loginInfo = jsonDecode(strLoginInfo);
+                //   var myRes = await GetPlateSearch().getData(loginInfo['token'],
+                //       twoDigit.text + letter.text + threeDigit.text + iranDigit.text);
+                //   if (myRes.statusCode == 0) {
+                //     setState(() {
+                //       _fillForm(jsonDecode(myRes.data!));
+                //     });
+                //   } else {
+                //     ShowModal(
+                //       content: myRes.errors.toString(),
+                //       title: myRes.statusCode.toString(),
+                //     ).Message(context);
+                //   }
+                // }
               },
               child: Icon(Icons.search)),
           Row(
@@ -767,7 +760,6 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
             controller: driverAddressController,
           ),
 
-
           if (_base64Image != null)
             Container(
               // child: Text(
@@ -828,17 +820,23 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
                 else
                   strErrors += 'تلفن همراه باید 11 رقم باشد' + '\n';
 
-                if (analyzeMethodController.text == "2" &&
-                        (pollutantRegisterModel.engineType == 0 &&
-                            (O2Controller.text.isEmpty ||
-                                LambdaController.text.isEmpty ||
-                                COController.text.isEmpty ||
-                                HCController.text.isEmpty ||
-                                NOController.text.isEmpty ||
-                                CO2Controller.text.isEmpty)) ||
-                    (pollutantRegisterModel.engineType == 1 &&
-                        (OpacityController.text.isEmpty || KController.text.isEmpty)))
-                  strErrors += 'مقادیر دستگاه آنالایزر وارد نشده است' + '\n';
+                if (analyzeMethodController.text == "2") {
+                  if (pollutantRegisterModel.engineType == 0) {
+                    if (O2Controller.text.isEmpty ||
+                        LambdaController.text.isEmpty ||
+                        COController.text.isEmpty ||
+                        HCController.text.isEmpty ||
+                        NOController.text.isEmpty ||
+                        CO2Controller.text.isEmpty) {
+                      strErrors += 'مقادیر دستگاه آنالایزر وارد نشده است' + '\n';
+                    }
+                  }
+                  if (pollutantRegisterModel.engineType == 1) {
+                    if (OpacityController.text.isEmpty || KController.text.isEmpty) {
+                      strErrors += 'مقادیر دستگاه آنالایزر وارد نشده است' + '\n';
+                    }
+                  }
+                }
 
                 if (carModelController.text == "") {
                   strErrors += 'مدل خودرو وارد نشده است' + '\n';

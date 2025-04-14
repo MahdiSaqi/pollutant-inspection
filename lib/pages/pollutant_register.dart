@@ -22,7 +22,8 @@ class PollutantRegister extends StatelessWidget {
             content: 'از برگشت به صفحه اصلی اطمینان دارید',
             okButton: () {
               Navigator.pop(context);
-              Navigator.of(context).pop();
+              Navigator.pop(context);
+              Navigator.pop(context);
             }).Message(context);
       },
       child: Scaffold(

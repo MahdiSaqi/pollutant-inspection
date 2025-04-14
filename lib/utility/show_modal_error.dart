@@ -11,9 +11,9 @@ class ShowModal {
     this.okButton,
   });
 
-  void Message(BuildContext context) {
+  void Message(BuildContext _context) {
     showDialog(
-      context: context,
+      context: _context,
       builder: (BuildContext context) {
         return Directionality(
           textDirection: TextDirection.rtl,
@@ -29,10 +29,9 @@ class ShowModal {
                     foregroundColor: MaterialStatePropertyAll(Colors.white),
                   ),
                   onPressed: () {
-                    // Navigator.pop(context);
                     okButton!();
                   },
-                  child: Text('تایید'),
+                  child: Icon(Icons.check),
                 ), // Text for the Ok button
               CloseButton(
                 style: ButtonStyle(
