@@ -251,13 +251,33 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
       return true;
   }
 
+  bool isNeedTechnical(int year) {
+    if (year < (Jalali.now().year - 5))
+      return true;
+    else
+      return false;
+  }
+
   void _fillForm(Map<String, dynamic> res) {
     if (!res['registerIsValid']) {
       ShowModal(title: 'خطا', content: 'این پلاک اخیرا ثبت شده است و امکان ثبت وجود ندارد')
           .Message(context);
       return;
     }
-    pollutantRegisterModel = PollutantRegisterModel.fromJson(res['notice']);
+
+    var pollutantRes = PollutantRegisterModel.fromJson(res['notice']);
+    pollutantRegisterModel.engineType = pollutantRes.engineType;
+    pollutantRegisterModel.fuelType = pollutantRes.fuelType;
+    pollutantRegisterModel.isDual = pollutantRes.isDual;
+
+    pollutantRegisterModel.carModel = pollutantRes.carModel;
+    needTechnicalDiagnosis = isNeedTechnical(pollutantRes.carModel);
+
+    pollutantRegisterModel.driverName = pollutantRes.driverName;
+    pollutantRegisterModel.driverFamily = pollutantRes.driverFamily;
+    pollutantRegisterModel.driverNationalCode = pollutantRes.driverNationalCode;
+    pollutantRegisterModel.driverMobile = pollutantRes.driverMobile;
+    pollutantRegisterModel.driverAddress = pollutantRes.driverAddress;
 
     setState(() {
       engineTypeController.text = (pollutantRegisterModel.engineType + 1).toString();
@@ -496,10 +516,11 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
                           setState(() {
                             carModelController.text = selectedDate.year.toString();
                             pollutantRegisterModel.carModel = selectedDate.year;
-                            if (selectedDate.year < (Jalali.now().year - 5))
-                              needTechnicalDiagnosis = true;
-                            else
-                              needTechnicalDiagnosis = false;
+                            needTechnicalDiagnosis = isNeedTechnical(selectedDate.year);
+                            // if (selectedDate.year < (Jalali.now().year - 5))
+                            //   needTechnicalDiagnosis = true;
+                            // else
+                            //   needTechnicalDiagnosis = false;
 
                             // Return the selected year
                           });
@@ -549,7 +570,7 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
           MyFormField(
             labelText: 'تلفن همراه',
             controller: driverMobileController,
-            keyboardType: TextInputType.number,
+            keyboardType: TextInputType.phone,
             maxLength: 11,
           ),
           // MyFormField(
@@ -645,14 +666,14 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
             onChanged: (selectedValue) {
               _onChanged(selectedValue);
               int id = int.parse(selectedValue['id']);
-              if (id == 8)
+              if (id == 8) {
+                pollutantRegisterModel.recordedDocument = 8;
                 setState(() {
-                  pollutantRegisterModel.recordedDocument = id;
                   hasRecordedDocument = false;
                 });
-              else
+              } else
                 setState(() {
-                  pollutantRegisterModel.recordedDocument = -1;
+                  // pollutantRegisterModel.recordedDocument = 0;
                   recordedDocumentController.text = "0";
                   hasRecordedDocument = true;
                 });
@@ -725,8 +746,6 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
                     dateController.text = picked.formatCompactDate();
                     pollutantRegisterModel.technicalDiagnosisDateTime =
                         picked.toDateTime().toString();
-                    print(picked.toDateTime());
-                    print(pollutantRegisterModel.technicalDiagnosisDateTime);
                   });
                 }
               },
@@ -917,7 +936,6 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
                 if (KController.text.isNotEmpty)
                   pollutantRegisterModel.pollutantsValue.add(PollutantValue(
                       pollutant: CarsPollutants.K, value: double.parse(KController.text)));
-
                 ShowModal(
                     title: 'اطلاعات زیر ثبت شود؟',
                     content: "شماره پلاک: " +

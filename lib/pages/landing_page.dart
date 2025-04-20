@@ -242,7 +242,7 @@ class _LandingPageState extends State<LandingPage> {
                     SizedBox(
                       height:  MediaQuery.of(context).size.height * 0.3,
                     ),
-                    Text('طراحی و توسعه توسط فتاپ نسخه 1.0')
+                    Text('طراحی و توسعه توسط فتاپ نسخه 1.1')
                   ],
                 ),
               ],

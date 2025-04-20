@@ -86,11 +86,22 @@ class _DailyReportState extends State<DailyReport> {
                         DataCell(Text(item['ownerFamily'] ?? '')),
                         DataCell(Text(item['carType']['title'])),
                         DataCell(Text(item['ownerMobile'].toString() ?? '')),
-                        DataCell(Text(item['carPlate']?.toString() ?? '')),
+                        DataCell(Text(
+                            // textDirection: TextDirection.ltr,
+
+                            item['carPlate']!
+                                        .toString()
+                                        .substring(0, item['carPlate']!.toString().length - 2) +
+                                    '  ایران ' +
+                                    item['carPlate']!
+                                        .toString()
+                                        .substring(item['carPlate']!.toString().length - 2) ??
+                                '')),
                         DataCell(Text(item['ownerNationalCode'].toString() ?? '')),
                         DataCell(Text(Jalali.fromDateTime(DateTime.parse(item['createAt']))
                                 .formatCompactDate()
-                                .toString() + "-"+
+                                .toString() +
+                            "-" +
                             DateTime.parse(item['createAt']).hour.toString() +
                             ":" +
                             DateTime.parse(item['createAt']).minute.toString())),
