@@ -319,6 +319,7 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
       // officersController.text="0"; //چون در همه ثبت های آن لاگین افسر شیفت تغییر نمی کند
       districtController.text = "0";
       relationWithOwnerController.text = "0";
+      actionTypeController.text = "0";
       recordedDocumentController.text = "0";
       carTypesController.text = "0";
       engineTypeController.text = "0";
@@ -667,7 +668,7 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
               _onChanged(selectedValue);
               int id = int.parse(selectedValue['id']);
               if (id == 8) {
-                pollutantRegisterModel.recordedDocument = 8;
+                pollutantRegisterModel.recordedDocument = id;
                 setState(() {
                   hasRecordedDocument = false;
                 });
