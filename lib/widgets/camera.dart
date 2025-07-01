@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:image/image.dart' as img;
 import 'package:pollutant_inspection/widgets/button_style.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 class PictureForm extends StatefulWidget {
   final String labelText; // Optional label text for the picture field
@@ -25,10 +25,22 @@ class _PictureFormState extends State<PictureForm> {
     // final originalImage = img.decodeImage(pickedImage as Uint8List);
     // final newImage = img.copyResize(originalImage!, width: originalImage.width, height: originalImage.height);
     // img.drawString(newImage,  "textToWrite" , font: img.BitmapFont.fromFnt("arial",newImage));
-    setState(() {
+    setState(() async {
       if (pickedImage != null) {
         _imageFile = File(pickedImage.path);
-        // _imageFile = File(newImage as String);
+
+
+        // var x= await _imageFile?.length();///view image size
+
+        final _webp = await FlutterImageCompress.compressWithFile(
+          _imageFile!.absolute.path,
+          format: CompressFormat.webp,
+          quality: 80,
+        );
+        _imageFile?.writeAsBytesSync(_webp as List<int>,flush: true,mode: FileMode.write);
+
+        // var y=await _imageFile?.length();///view image size
+
         widget.onImageSelected(_imageFile);
       }
     });
