@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:pollutant_inspection/models/SIMA_base_definitions.dart';
+import 'package:pollutant_inspection/pages/call_back_login.dart';
 import 'package:pollutant_inspection/pages/landing_page.dart';
 import 'package:pollutant_inspection/pages/officer_selection.dart';
 import 'package:pollutant_inspection/pages/pollutant_register.dart';
@@ -12,6 +13,7 @@ import 'package:pollutant_inspection/server_utility/get_login_key.dart';
 import 'package:pollutant_inspection/utility/internet_checker.dart';
 import 'package:pollutant_inspection/utility/loding.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'models/constants.dart'; //test http#1
 
@@ -36,7 +38,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Constants.appTitle',
+      title: Constants.appTitle,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         fontFamily: 'B Yekan',
@@ -153,11 +155,9 @@ class _NavigateToWebLoginState extends State<NavigateToWebLogin> {
 
       if (res != null && res.statusCode == 0) {
         var loginKey = jsonDecode(res.data!);
-        Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => Container(child: WebLogin(loginKey))
-                // PollutantRegister()
-                ));
+        // Navigator.push(context,MaterialPageRoute(builder: (context) => Container(child: WebLogin(loginKey))));//internal browser
+        Navigator.push(context, MaterialPageRoute(builder: (context) => Container(child: CallBackLogin(loginKey))));//external browser
+
       } else if (res?.statusCode == -2) {
         setState(() {
           isRetry = true;
@@ -223,7 +223,25 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       body: Center(
+
         child: NavigateToWebLogin(),
+
+        ///other way to login with ext. browser
+        // child: ElevatedButton(
+        //   child: Text("data"),
+        //   onPressed: () async {
+        //     var res = await Login().getLoginKey();
+        //     var loginKey = jsonDecode(res!.data!);
+        //     var url = Uri.parse(Constants.loginPageUri + loginKey + "?state=" + Constants.state);
+        //     // launchUrl(
+        //     //   Uri.parse("https://login.mashhad.ir/Authentication/Start/82fa84bb-bcd1-4716-b551-c0314f23978b?state=2") ,
+        //     //   mode: LaunchMode.inAppBrowserView
+        //     // );
+        //     Navigator.push(context, MaterialPageRoute(builder: (context) => Container(child: CallBackLogin())));
+        //   },
+        // ),
+
+
       ),
     );
   }
