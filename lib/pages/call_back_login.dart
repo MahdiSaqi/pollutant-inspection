@@ -45,7 +45,7 @@ class _CallBackLoginState extends State<CallBackLogin> {
     // handle initial link when app is launched by a link
     _initInitialUri();
 
-    launchUrl(Uri.parse(Constants.loginPageUri + widget.loginKey + "?state=" + Constants.state),
+    launchUrl(Uri.parse(Constants.loginPageUri + widget.loginKey),
         mode: LaunchMode.inAppBrowserView);
 
     // handle subsequent incoming links while app is running
@@ -89,7 +89,7 @@ class _CallBackLoginState extends State<CallBackLogin> {
 
 
     //////??????for dev...
-    if (Constants().isDevelop) token = '1111';
+    // if (Constan/ts().isDevelop) token = '1111';
 
     if (token != null) {
       //Navigator.pop(context);

@@ -110,6 +110,7 @@
 
 ///*******************************************
 import 'dart:convert';
+//import 'dart:js';
 
 import 'package:flutter/material.dart';
 import 'package:pollutant_inspection/main.dart';
@@ -117,7 +118,9 @@ import 'package:pollutant_inspection/pages/daily_report.dart';
 import 'package:pollutant_inspection/pages/pollutant_register.dart';
 import 'package:pollutant_inspection/utility/get_current_location.dart';
 import 'package:pollutant_inspection/utility/show_modal_error.dart';
+import 'package:pollutant_inspection/utility/show_modal_with_selector.dart';
 import 'package:pollutant_inspection/widgets/button_style.dart';
+import 'package:pollutant_inspection/widgets/form_field.dart';
 import 'package:pollutant_inspection/widgets/logined_user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -238,7 +241,6 @@ class _LandingPageState extends State<LandingPage> {
                         ),
                       ),
                     ),
-                    //GetCurrentLocation(),///for test
                     SizedBox(
                       height:  MediaQuery.of(context).size.height * 0.3,
                     ),

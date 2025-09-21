@@ -109,6 +109,8 @@ class _NavigateToWebLoginState extends State<NavigateToWebLogin> {
           loginKey();
         }
       } else {
+
+
         loginKey();
 
         ///is code for test on local
@@ -226,7 +228,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
         child: NavigateToWebLogin(),
 
-        ///other way to login with ext. browser
+        ///other way to login with ext. browser روش دیگری جایگزین شد که از داخل متد loginkey هدایت می شود
         // child: ElevatedButton(
         //   child: Text("data"),
         //   onPressed: () async {

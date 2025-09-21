@@ -7,6 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_persian_calendar/flutter_persian_calendar.dart';
+import 'package:shamsi_date/shamsi_date.dart' as shamsi;
+
 
 import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 import 'package:pollutant_inspection/enums/cars_pollutants.dart';
@@ -22,6 +25,7 @@ import 'package:pollutant_inspection/server_utility/send_pollutant_information.d
 import 'package:pollutant_inspection/utility/get_current_location.dart';
 import 'package:pollutant_inspection/utility/loding.dart';
 import 'package:pollutant_inspection/utility/show_modal_error.dart';
+import 'package:pollutant_inspection/utility/show_modal_with_selector.dart';
 import 'package:pollutant_inspection/widgets/button_style.dart';
 import 'package:pollutant_inspection/widgets/camera.dart';
 import 'package:pollutant_inspection/widgets/dropdown_2.dart';
@@ -160,7 +164,7 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
       carModelController = TextEditingController(text: ""),
       technicalCentersController = TextEditingController(text: "0"),
       //sourceCategoriesController = TextEditingController(text: "0"),
-      dateController = TextEditingController(text: "0"),
+      dateController = TextEditingController(text: ""),
       //plate controllers
       twoDigit = TextEditingController(text: ""),
       letter = TextEditingController(text: ""),
@@ -336,7 +340,7 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
     var tempOfficerID = pollutantRegisterModel.officerId;
     pollutantRegisterModel = PollutantRegisterModel();
     pollutantRegisterModel.officerId = tempOfficerID;
-    _scrollController.jumpTo(0);
+    _scrollController.jumpTo(5);
     // FocusScope.of(context).requestFocus(nameFieldFocus);
   }
 
@@ -407,6 +411,96 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
             color: Colors.white,
             searchFunction: _searchFunction,
           ),
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          MyFormField(
+              keyboardType: TextInputType.none,
+              labelText: "تاریخ اخذ معاینه فنی",
+              controller: dateController,
+              onTap: () async {
+
+
+
+                showDialog(
+                  context: context,
+                  builder: (dialogCtx) {
+                    return AlertDialog(
+                      content: PersianCalendar(height: 400,
+                        // height: 250.0,
+                        // backgroundColor: Colors.grey.shade100,
+                        // primaryColor: Colors.pink.shade200,
+                        // secondaryColor: Colors.blue.shade200,
+                        // textStyle: const TextStyle(fontSize: 8, color: Colors.black87,height: 5),
+                        startingDate: shamsi.Jalali(shamsi.Jalali.now().year-4),
+                        endingDate: shamsi.Jalali.now(),
+                        initialDate: shamsi.Jalali(shamsi.Jalali.now().year,12,1),
+                        onDateChanged: (jalaliDate) {
+                          //debugPrint('Dialog - selected date: $jalaliDate');
+                          dateController.text = jalaliDate.toString();
+                        },
+                      ),
+                    );
+                  },
+                );
+
+
+                // List<String> items = [
+                //   '1', '2', '3', '4', '5', '6', '7', '8', '9', '10',
+                //   '11', '12', '13', '14', '15', '16', '17', '18', '19', '20',
+                //   '21', '22', '23', '24', '25', '26', '27', '28', '29', '30','31'
+                // ];
+                // var day = await ShowModalWithSelector().Show(context, items);
+                // items = [
+                //   'فروردین',
+                //   'اردیبهشت',
+                //   'خرداد',
+                //   'تیر',
+                //   'مرداد',
+                //   'شهریور',
+                //   'مهر',
+                //   'آبان',
+                //   'آذر',
+                //   'دی',
+                //   'بهمن',
+                //   'اسفند',
+                // ];
+                // var month = await ShowModalWithSelector().Show(context, items);
+
+
+              }),
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
           ElevatedButton(
               onPressed: () async {
                 _searchFunction();
@@ -724,11 +818,16 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
                 Jalali? picked = await showPersianDatePicker(
                     context: context,
                     initialDate: Jalali.now(),
-                    firstDate: Jalali(1400, 1),
+                    // firstDate: Jalali(1400, 1),
+                    firstDate: Jalali(Jalali.now().year-2),
                     lastDate: Jalali.now(),
                     //Jalali(1450, 9),
+                    // initialEntryMode: PDatePickerEntryMode.calendarOnly,
+                    // initialDatePickerMode: PDatePickerMode.year,
                     initialEntryMode: PDatePickerEntryMode.calendarOnly,
                     initialDatePickerMode: PDatePickerMode.year,
+
+
                     builder: (context, child) {
                       return Theme(
                         data: ThemeData(

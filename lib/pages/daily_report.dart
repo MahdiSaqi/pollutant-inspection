@@ -68,13 +68,17 @@ class _DailyReportState extends State<DailyReport> {
                   child: DataTable(
                     columns: [
                       DataColumn(label: Text('ردیف')), // Row number column
-                      DataColumn(label: Text('نام مالک')),
-                      DataColumn(label: Text('نوع خودرو')),
-                      // Add more columns here as needed
+                      DataColumn(label: Text('نام')),
+                      DataColumn(label: Text('نام خانوادگی')),
                       DataColumn(label: Text('تلفن همراه')),
-                      DataColumn(label: Text('شماره پلاک')),
                       DataColumn(label: Text('کد ملی مالک')),
+                      DataColumn(label: Text('نوع خودرو')),
+                      DataColumn(label: Text('مدل خودرو')),
+                      // Add more columns here as needed
+                      DataColumn(label: Text('شماره پلاک')),
                       DataColumn(label: Text('زمان ثبت')),
+                      DataColumn(label: Text('مرکز معاینه فنی')),
+                      DataColumn(label: Text('تاریخ معاینه')),
                     ],
                     rows: data.asMap().entries.map((entry) {
                       int index = entry.key; // Get the index
@@ -83,9 +87,12 @@ class _DailyReportState extends State<DailyReport> {
                       return DataRow(cells: [
                         DataCell(Text((index + 1).toString())),
                         // Use index + 1 for row number
+                        DataCell(Text(item['ownerName'] ?? '')),
                         DataCell(Text(item['ownerFamily'] ?? '')),
-                        DataCell(Text(item['carType']['title'])),
                         DataCell(Text(item['ownerMobile'].toString() ?? '')),
+                        DataCell(Text(item['ownerNationalCode'].toString() ?? '')),
+                        DataCell(Text(item['carType']['title'])),
+                        DataCell(Text(item['carModel'].toString())),
                         DataCell(Text(
                             // textDirection: TextDirection.ltr,
 
@@ -97,7 +104,6 @@ class _DailyReportState extends State<DailyReport> {
                                         .toString()
                                         .substring(item['carPlate']!.toString().length - 2) ??
                                 '')),
-                        DataCell(Text(item['ownerNationalCode'].toString() ?? '')),
                         DataCell(Text(Jalali.fromDateTime(DateTime.parse(item['createAt']))
                                 .formatCompactDate()
                                 .toString() +
@@ -105,6 +111,18 @@ class _DailyReportState extends State<DailyReport> {
                             DateTime.parse(item['createAt']).hour.toString() +
                             ":" +
                             DateTime.parse(item['createAt']).minute.toString())),
+                        item['technicalDiagnosisCenter'] != null
+                            ? DataCell(Text(item['technicalDiagnosisCenter']['title']))
+                            :DataCell(Text('-')),
+                        item['technicalDiagnosisDateTime'] != null
+                            ? DataCell(Text(Jalali.fromDateTime(DateTime.parse(item['technicalDiagnosisDateTime']))
+                            .formatCompactDate()
+                            .toString() +
+                            "-" +
+                            DateTime.parse(item['technicalDiagnosisDateTime']).hour.toString() +
+                            ":" +
+                            DateTime.parse(item['technicalDiagnosisDateTime']).minute.toString()))
+                            : DataCell(Text('-')),
                       ]);
                     }).toList(), // Convert Iterable to List
                   ),
