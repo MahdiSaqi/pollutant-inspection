@@ -10,7 +10,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_persian_calendar/flutter_persian_calendar.dart';
 import 'package:shamsi_date/shamsi_date.dart' as shamsi;
 
-
 import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 import 'package:pollutant_inspection/enums/cars_pollutants.dart';
 import 'package:pollutant_inspection/enums/fueling_type.dart';
@@ -413,94 +412,6 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
           ),
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-          MyFormField(
-              keyboardType: TextInputType.none,
-              labelText: "تاریخ اخذ معاینه فنی",
-              controller: dateController,
-              onTap: () async {
-
-
-
-                showDialog(
-                  context: context,
-                  builder: (dialogCtx) {
-                    return AlertDialog(
-                      content: PersianCalendar(height: 400,
-                        // height: 250.0,
-                        // backgroundColor: Colors.grey.shade100,
-                        // primaryColor: Colors.pink.shade200,
-                        // secondaryColor: Colors.blue.shade200,
-                        // textStyle: const TextStyle(fontSize: 8, color: Colors.black87,height: 5),
-                        startingDate: shamsi.Jalali(shamsi.Jalali.now().year-4),
-                        endingDate: shamsi.Jalali.now(),
-                        initialDate: shamsi.Jalali(shamsi.Jalali.now().year,12,1),
-                        onDateChanged: (jalaliDate) {
-                          //debugPrint('Dialog - selected date: $jalaliDate');
-                          dateController.text = jalaliDate.toString();
-                        },
-                      ),
-                    );
-                  },
-                );
-
-
-                // List<String> items = [
-                //   '1', '2', '3', '4', '5', '6', '7', '8', '9', '10',
-                //   '11', '12', '13', '14', '15', '16', '17', '18', '19', '20',
-                //   '21', '22', '23', '24', '25', '26', '27', '28', '29', '30','31'
-                // ];
-                // var day = await ShowModalWithSelector().Show(context, items);
-                // items = [
-                //   'فروردین',
-                //   'اردیبهشت',
-                //   'خرداد',
-                //   'تیر',
-                //   'مرداد',
-                //   'شهریور',
-                //   'مهر',
-                //   'آبان',
-                //   'آذر',
-                //   'دی',
-                //   'بهمن',
-                //   'اسفند',
-                // ];
-                // var month = await ShowModalWithSelector().Show(context, items);
-
-
-              }),
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
           ElevatedButton(
               onPressed: () async {
                 _searchFunction();
@@ -810,46 +721,104 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
           else
             Text('معاینه فنی نیاز ندارد'),
           if (needTechnicalDiagnosis && hasTech)
+
+
+            ///در زیر از یک پکیج استفاده می شد که خواستند عوض شود کد زیر فعلا کامنت و پکیج بعدی جایگزین شده است
+            // MyFormField(
+            //   keyboardType: TextInputType.none,
+            //   labelText: "تاریخ اخذ معاینه فنی",
+            //   controller: dateController,
+            //   onTap: () async {
+            //     Jalali? picked = await showPersianDatePicker(
+            //         context: context,
+            //         initialDate: Jalali.now(),
+            //         // firstDate: Jalali(1400, 1),
+            //         firstDate: Jalali(Jalali.now().year - 2),
+            //         lastDate: Jalali.now(),
+            //         //Jalali(1450, 9),
+            //         // initialEntryMode: PDatePickerEntryMode.calendarOnly,
+            //         // initialDatePickerMode: PDatePickerMode.year,
+            //         initialEntryMode: PDatePickerEntryMode.calendarOnly,
+            //         initialDatePickerMode: PDatePickerMode.year,
+            //         builder: (context, child) {
+            //           return Theme(
+            //             data: ThemeData(
+            //               dialogTheme: const DialogTheme(
+            //                 shape: RoundedRectangleBorder(
+            //                   borderRadius: BorderRadius.all(Radius.circular(0)),
+            //                 ),
+            //               ),
+            //             ),
+            //             child: child!,
+            //           );
+            //         });
+            //
+            //     if (picked != null && picked != _selectedDate) {
+            //       setState(() {
+            //         dateController.text = picked.formatCompactDate();
+            //         pollutantRegisterModel.technicalDiagnosisDateTime =
+            //             picked.toDateTime().toString();
+            //       });
+            //     }
+            //   },
+            // ),
+
             MyFormField(
-              keyboardType: TextInputType.none,
-              labelText: "تاریخ اخذ معاینه فنی",
-              controller: dateController,
-              onTap: () async {
-                Jalali? picked = await showPersianDatePicker(
+                keyboardType: TextInputType.none,
+                labelText: "تاریخ اخذ معاینه فنی",
+                controller: dateController,
+                onTap: () async {
+                  showDialog(
                     context: context,
-                    initialDate: Jalali.now(),
-                    // firstDate: Jalali(1400, 1),
-                    firstDate: Jalali(Jalali.now().year-2),
-                    lastDate: Jalali.now(),
-                    //Jalali(1450, 9),
-                    // initialEntryMode: PDatePickerEntryMode.calendarOnly,
-                    // initialDatePickerMode: PDatePickerMode.year,
-                    initialEntryMode: PDatePickerEntryMode.calendarOnly,
-                    initialDatePickerMode: PDatePickerMode.year,
-
-
-                    builder: (context, child) {
-                      return Theme(
-                        data: ThemeData(
-                          dialogTheme: const DialogTheme(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(0)),
-                            ),
-                          ),
+                    builder: (dialogCtx) {
+                      return AlertDialog(
+                        content: PersianCalendar(
+                          //height: 400,
+                          height: MediaQuery.of(context).size.height * 0.7,
+                          // height: 250.0,
+                          // backgroundColor: Colors.grey.shade100,
+                          // primaryColor: Colors.pink.shade200,
+                          // secondaryColor: Colors.blue.shade200,
+                          // textStyle: const TextStyle(fontSize: 8, color: Colors.black87,height: 5),
+                          startingDate: shamsi.Jalali(shamsi.Jalali.now().year - 4),
+                          endingDate: shamsi.Jalali.now(),
+                          initialDate: shamsi.Jalali(shamsi.Jalali.now().year, 12, 1),
+                          onDateChanged: (jalaliDate) {
+                            //debugPrint('Dialog - selected date: $jalaliDate');
+                            dateController.text =
+                                Jalali(jalaliDate.year, jalaliDate.month, jalaliDate.day)
+                                    .formatCompactDate()
+                                    .toString();
+                          },
                         ),
-                        child: child!,
                       );
-                    });
+                    },
+                  );
 
-                if (picked != null && picked != _selectedDate) {
-                  setState(() {
-                    dateController.text = picked.formatCompactDate();
-                    pollutantRegisterModel.technicalDiagnosisDateTime =
-                        picked.toDateTime().toString();
-                  });
-                }
-              },
-            ),
+                  // List<String> items = [
+                  //   '1', '2', '3', '4', '5', '6', '7', '8', '9', '10',
+                  //   '11', '12', '13', '14', '15', '16', '17', '18', '19', '20',
+                  //   '21', '22', '23', '24', '25', '26', '27', '28', '29', '30','31'
+                  // ];
+                  // var day = await ShowModalWithSelector().Show(context, items);
+                  // items = [
+                  //   'فروردین',
+                  //   'اردیبهشت',
+                  //   'خرداد',
+                  //   'تیر',
+                  //   'مرداد',
+                  //   'شهریور',
+                  //   'مهر',
+                  //   'آبان',
+                  //   'آذر',
+                  //   'دی',
+                  //   'بهمن',
+                  //   'اسفند',
+                  // ];
+                  // var month = await ShowModalWithSelector().Show(context, items);
+                }),
+
+
           if (needTechnicalDiagnosis && hasTech)
             DropdownList(
               key: GlobalKey(),
