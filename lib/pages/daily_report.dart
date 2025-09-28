@@ -66,6 +66,7 @@ class _DailyReportState extends State<DailyReport> {
                 child: Container(
                   alignment: Alignment.topRight,
                   child: DataTable(
+                    headingRowColor: MaterialStatePropertyAll(Colors.greenAccent),
                     columns: [
                       DataColumn(label: Text('ردیف')), // Row number column
                       DataColumn(label: Text('نام')),

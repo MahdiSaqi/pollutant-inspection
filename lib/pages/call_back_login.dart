@@ -66,7 +66,7 @@ class _CallBackLoginState extends State<CallBackLogin> {
   }
 
   Future<void> _processUri(Uri uri) async {
-    setState(() => _latestLink = uri.toString());
+    // setState(() => _latestLink = uri.toString());
     // parse query parameters:
     final params = uri.queryParameters; // Map<String, String>
     var token = params['token'];

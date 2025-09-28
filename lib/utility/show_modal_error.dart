@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pollutant_inspection/widgets/button_style.dart';
 
@@ -17,7 +18,7 @@ class ShowModal {
       builder: (BuildContext context) {
         return Directionality(
           textDirection: TextDirection.rtl,
-          child: AlertDialog(
+          child: AlertDialog(actionsAlignment: MainAxisAlignment.center,
             // backgroundColor: Colors.white.withOpacity(0.5),
             title: Text(this.title),
             content: Text(this.content),
@@ -25,6 +26,8 @@ class ShowModal {
               if (okButton != null)
                 TextButton(
                   style: ButtonStyle(
+                    shape: MaterialStatePropertyAll(
+                        RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
                     backgroundColor: MaterialStatePropertyAll(Colors.blue),
                     foregroundColor: MaterialStatePropertyAll(Colors.white),
                   ),
@@ -32,15 +35,28 @@ class ShowModal {
                     okButton!();
                   },
                   child: Icon(Icons.check),
-                ), // Text for the Ok button
-              CloseButton(
+                ), // Text for the Ok
+              TextButton(
                 style: ButtonStyle(
-                    backgroundColor: MaterialStatePropertyAll(Colors.red),
-                    foregroundColor: MaterialStatePropertyAll(Colors.white)),
+                  shape: MaterialStatePropertyAll(
+                      RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                  backgroundColor: MaterialStatePropertyAll(Colors.red),
+                  foregroundColor: MaterialStatePropertyAll(Colors.white),
+                ),
                 onPressed: () {
                   Navigator.pop(context);
                 },
-              )
+                child: Icon(Icons.close),
+              ), // Text for the Ok button
+
+              // CloseButton(
+              //   style: ButtonStyle(
+              //       backgroundColor: MaterialStatePropertyAll(Colors.red),
+              //       foregroundColor: MaterialStatePropertyAll(Colors.white)),
+              //   onPressed: () {
+              //     Navigator.pop(context);
+              //   },
+              // )
               // cancelButton,
               // continueButton,
             ],
