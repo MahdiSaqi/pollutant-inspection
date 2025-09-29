@@ -48,7 +48,7 @@ class _LSPlateState extends State<LSPlate> {
     });
     widget.letter.addListener(() {
       // FocusScope.of(context).requestFocus(threeDigitFocus);
-      threeDigitFocus.requestFocus();
+      twoDigitFocus.requestFocus();
     });
 
 
