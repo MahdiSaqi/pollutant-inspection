@@ -331,7 +331,7 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
       technicalCentersController.text = "0";
       analyzeMethodController.text = "0";
       hasTechnicalDiagnosisController.text = "0";
-      letter.text = "-";
+      letter.text = "";
       hasTech = false;
       hasAnalyzer = false;
       _base64Image = null;
@@ -339,7 +339,7 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
     var tempOfficerID = pollutantRegisterModel.officerId;
     pollutantRegisterModel = PollutantRegisterModel();
     pollutantRegisterModel.officerId = tempOfficerID;
-    _scrollController.jumpTo(5);
+    _scrollController.jumpTo(0);
     // FocusScope.of(context).requestFocus(nameFieldFocus);
   }
 
@@ -780,15 +780,19 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
                           // primaryColor: Colors.pink.shade200,
                           // secondaryColor: Colors.blue.shade200,
                           // textStyle: const TextStyle(fontSize: 8, color: Colors.black87,height: 5),
-                          startingDate: shamsi.Jalali(shamsi.Jalali.now().year - 4),
-                          endingDate: shamsi.Jalali.now(),
-                          initialDate: shamsi.Jalali(shamsi.Jalali.now().year, 12, 1),
+                          startingDate: shamsi.Jalali(shamsi.Jalali.now().year - 4,1,1),
+                          endingDate: shamsi.Jalali.now(), //shamsi.Jalali(shamsi.Jalali.now().year, 12),
+                          initialDate: shamsi.Jalali.now(),// shamsi.Jalali(shamsi.Jalali.now().year, 12, 1),
                           onDateChanged: (jalaliDate) {
                             //debugPrint('Dialog - selected date: $jalaliDate');
+                            var picked = Jalali(jalaliDate.year, jalaliDate.month, jalaliDate.day).toDateTime();
                             dateController.text =
                                 Jalali(jalaliDate.year, jalaliDate.month, jalaliDate.day)
                                     .formatCompactDate()
                                     .toString();
+
+                            pollutantRegisterModel.technicalDiagnosisDateTime = picked.toString();
+                            print(picked);
                           },
                         ),
                       );
@@ -885,6 +889,9 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
               onPressed: () async {
                 String strErrors = "";
 
+                if(pollutantRegisterModel.officerId == null)
+                  strErrors += "مشکلی در انتخاب افسر پیش آمده است. لطفا از حساب کاربری خارج و دوباره وارد شوید";
+
                 if (isCorrectPlate())
                   pollutantRegisterModel.carPlate =
                       twoDigit.text + letter.text + threeDigit.text + iranDigit.text;
@@ -959,6 +966,9 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
                     (hasTech && technicalCentersController.text == "0") ||
                     districtController.text == "0")
                   strErrors += 'گزینه های انتخاب نشده را انتخاب کنید' + '\n';
+
+                if(pollutantRegisterModel.recordedDocument == -1)
+                  strErrors += 'نوع اعمال قانون یا مدرک ضبط شده به درستی انتخاب نشده است' + '\n';
 
                 if (strErrors.length > 0) {
                   ShowModal(title: 'خطا', content: strErrors).Message(context);

@@ -46,10 +46,10 @@ class _LSPlateState extends State<LSPlate> {
       if (widget.threeDigit.text.length==3) FocusScope.of(context).requestFocus(iranDigitFocus);
       // threeDigitFocus.requestFocus();
     });
-    widget.letter.addListener(() {
-      // FocusScope.of(context).requestFocus(threeDigitFocus);
-      twoDigitFocus.requestFocus();
-    });
+    // widget.letter.addListener(() {
+    //   // FocusScope.of(context).requestFocus(threeDigitFocus);
+    //   threeDigitFocus.requestFocus();
+    // });
 
 
   }
@@ -104,7 +104,8 @@ class _LSPlateState extends State<LSPlate> {
                             widget.letter.text = alphabet;
                           });
                           Navigator.of(context).pop();
-                          FocusScope.of(context).requestFocus(threeDigitFocus);
+                          // FocusScope.of(context).requestFocus(threeDigitFocus);
+                          threeDigitFocus.requestFocus();
                         },
                         child: Card(
                           margin: EdgeInsets.all(8.0),

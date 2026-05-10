@@ -114,15 +114,22 @@ class _DailyReportState extends State<DailyReport> {
                             DateTime.parse(item['createAt']).minute.toString())),
                         item['technicalDiagnosisCenter'] != null
                             ? DataCell(Text(item['technicalDiagnosisCenter']['title']))
-                            :DataCell(Text('-')),
+                            : DataCell(Text('-')),
                         item['technicalDiagnosisDateTime'] != null
-                            ? DataCell(Text(Jalali.fromDateTime(DateTime.parse(item['technicalDiagnosisDateTime']))
-                            .formatCompactDate()
-                            .toString() +
-                            "-" +
-                            DateTime.parse(item['technicalDiagnosisDateTime']).hour.toString() +
-                            ":" +
-                            DateTime.parse(item['technicalDiagnosisDateTime']).minute.toString()))
+                            ? DataCell(Text(Jalali.fromDateTime(
+                                        DateTime.parse(item['technicalDiagnosisDateTime']))
+                                    .formatCompactDate()
+                                    .toString()
+
+                                ///به دلیل اینکه ساعت معاینه فنی در اپ ثبت نمی شود لذا لزومی هم به نمایش آن نیست
+                                // +
+                                //     "-" +
+                                //     DateTime.parse(item['technicalDiagnosisDateTime']).hour.toString() +
+                                //     ":" +
+                                //     DateTime.parse(item['technicalDiagnosisDateTime'])
+                                //         .minute
+                                //         .toString()
+                                ))
                             : DataCell(Text('-')),
                       ]);
                     }).toList(), // Convert Iterable to List
