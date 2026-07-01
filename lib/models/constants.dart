@@ -36,5 +36,6 @@ class Constants {
 
   ///labels
   static const String clearForm = 'پاک کردن فرم';
-  static const String version = '1.6'; ///26 mehre 1404
+  //static const String version = '1.6'; ///26 mehre 1404
+  static const String version = '1.7'; ///10 tir 1405
 }

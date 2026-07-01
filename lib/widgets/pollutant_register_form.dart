@@ -255,7 +255,7 @@ class PollutantRegisterFormState extends State<PollutantRegisterForm> {
   }
 
   bool isNeedTechnical(int year) {
-    if (year < (Jalali.now().year - 5))
+    if (year <= (Jalali.now().year - 4))
       return true;
     else
       return false;
